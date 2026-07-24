@@ -162,7 +162,7 @@
           </div>
         </div>
         <table id="inv-table">
-          <thead><tr><th>Nickname</th><th>Código</th><th>Link</th><th>Expira</th><th>Usado</th></tr></thead>
+          <thead><tr><th>Nickname</th><th>Tipo</th><th>Status</th><th>Expira</th><th>Emitido em</th></tr></thead>
           <tbody></tbody>
         </table>
         <p class="empty" id="inv-empty" hidden>Nenhum convite ainda.</p>
@@ -177,12 +177,12 @@
         <button type="button" id="recovery-close" class="mini" aria-label="Fechar">Fechar</button>
       </div>
       <p id="recovery-summary" class="modal-copy"></p>
-      <p class="modal-note">Envie o link e o código por canais separados. As passkeys já cadastradas permanecem válidas.</p>
-      <label>Link de recuperação
+      <p id="recovery-note" class="modal-note">Envie o link e o código por canais separados. As passkeys já cadastradas permanecem válidas.</p>
+      <label id="recovery-link-label">Link de recuperação
         <textarea id="recovery-link" class="recovery-value" rows="3" readonly></textarea>
       </label>
       <button type="button" id="recovery-copy-link" class="mini">Copiar link</button>
-      <label>Código de recuperação
+      <label id="recovery-code-label">Código de recuperação
         <input id="recovery-code" class="recovery-value" readonly>
       </label>
       <button type="button" id="recovery-copy-code" class="mini">Copiar código</button>

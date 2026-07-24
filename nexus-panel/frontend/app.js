@@ -230,15 +230,43 @@ async function copyRecoveryValue(elementId, label) {
   }
 }
 
-function showRecoveryGrant(user, grant) {
-  const displayName = user.display_name || user.displayname || user.nickname || user.id;
-  document.getElementById('recovery-summary').textContent = `Recuperação criada para ${displayName}.`;
+function showPasskeyGrant({ title, summary, note, linkLabel, codeLabel, expiresFallback, grant }) {
+  document.getElementById('recovery-title').textContent = title;
+  document.getElementById('recovery-summary').textContent = summary;
+  document.getElementById('recovery-note').textContent = note;
+  document.getElementById('recovery-link-label').firstChild.textContent = linkLabel;
+  document.getElementById('recovery-code-label').firstChild.textContent = codeLabel;
   document.getElementById('recovery-link').value = grant.invite_url || '';
   document.getElementById('recovery-code').value = grant.invite_code || '';
   document.getElementById('recovery-expires').textContent = grant.invite_expires
     ? `Válido até ${new Date(grant.invite_expires).toLocaleString('pt-BR')}.`
-    : 'Válido por 30 minutos.';
+    : expiresFallback;
   document.getElementById('recovery-modal').hidden = false;
+}
+
+function showRecoveryGrant(user, grant) {
+  const displayName = user.display_name || user.displayname || user.nickname || user.id;
+  showPasskeyGrant({
+    title: 'Recuperação por passkey',
+    summary: `Recuperação criada para ${displayName}.`,
+    note: 'Envie o link e o código por canais separados. As passkeys já cadastradas permanecem válidas.',
+    linkLabel: 'Link de recuperação',
+    codeLabel: 'Código de recuperação',
+    expiresFallback: 'Válido por 30 minutos.',
+    grant,
+  });
+}
+
+function showInviteGrant(nickname, grant) {
+  showPasskeyGrant({
+    title: 'Convite por passkey',
+    summary: `Convite criado para ${nickname}.`,
+    note: 'Copie o link e o código agora e envie-os por canais separados. Eles só são exibidos nesta emissão.',
+    linkLabel: 'Link de ativação',
+    codeLabel: 'Código de ativação',
+    expiresFallback: 'Válido durante o evento.',
+    grant,
+  });
 }
 
 async function issuePasskeyRecovery(user) {
@@ -472,8 +500,10 @@ async function createInvite() {
   if (!nick) { toast('Informe o nickname', true); return; }
   try {
     const inv = await api('/admin/invites', { method: 'POST', body: JSON.stringify({ nickname: nick }) });
-    toast(`Convite criado: ${inv.invite_code}`);
+    if (!inv.invite_url || !inv.invite_code) throw new Error('O convite não retornou link e código.');
     document.getElementById('inv-nick').value = '';
+    showInviteGrant(nick, inv);
+    toast('Convite criado. Copie o link e o código.');
     loadInvites();
   } catch (e) { toast(e.message, true); }
 }
@@ -498,11 +528,26 @@ async function createBulkInvites() {
   if (!confirm(`Criar ${nicknames.length} convites?`)) return;
   const box = document.getElementById('inv-bulk-result');
   try {
-    const res = await api('/admin/invites/bulk', { method: 'POST', body: JSON.stringify({ nicknames }) });
+    const response = await fetch('/api/admin/invites/bulk.csv', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipients: nicknames.map(nickname => ({ nickname })), created_by: 'nexus-panel' }),
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.detail || `HTTP ${response.status}`);
+    }
+    const csv = await response.blob();
+    const url = URL.createObjectURL(csv);
+    const download = document.createElement('a');
+    download.href = url;
+    download.download = 'passkey-activation-grants.csv';
+    download.click();
+    URL.revokeObjectURL(url);
     box.hidden = false;
-    const fails = res.results.filter(r => !r.ok).map(r => `${r.nickname}: ${r.error}`);
-    box.innerHTML = `Criados: <b>${res.created}</b> · Falhas: <b>${res.failed}</b>` + (fails.length ? '<br>' + fails.map(esc).join('<br>') : '');
-    toast(`${res.created} convites criados.`);
+    box.textContent = `Arquivo com ${nicknames.length} emissão(ões) baixado. Confira a coluna status antes do envio.`;
+    toast('CSV de ativação baixado.');
     loadInvites();
   } catch (e) { toast(e.message, true); }
 }
@@ -514,14 +559,15 @@ async function loadInvites() {
     tbody.innerHTML = '';
     document.getElementById('inv-empty').hidden = invCache.length > 0;
     for (const i of invCache) {
-      const exp = i.invite_expires ? new Date(i.invite_expires).toLocaleDateString('pt-BR') : '—';
+      const exp = i.expires_at ? new Date(i.expires_at).toLocaleDateString('pt-BR') : '—';
+      const issued = i.created_at ? new Date(i.created_at).toLocaleString('pt-BR') : '—';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${esc(i.nickname)}</td>
-        <td><code>${esc(i.invite_code)}</code></td>
-        <td><a href="${esc(i.invite_url)}" target="_blank" style="color:var(--accent)">link</a></td>
+        <td>${esc(i.grant_type || '—')}</td>
+        <td>${esc(i.state || '—')}</td>
         <td>${exp}</td>
-        <td>${i.invite_used ? 'sim' : 'não'}</td>`;
+        <td>${issued}</td>`;
       tbody.appendChild(tr);
     }
   } catch (e) { toast('Erro ao carregar convites: ' + e.message, true); }
@@ -529,14 +575,14 @@ async function loadInvites() {
 
 function downloadInvitesCsv() {
   if (!invCache.length) { toast('Carregue os convites primeiro', true); return; }
-  const head = 'nickname,invite_code,invite_url,invite_expires,invite_used';
-  const rows = invCache.map(i => [i.nickname, i.invite_code, i.invite_url, i.invite_expires, i.invite_used]
+  const head = 'nickname,grant_type,state,expires_at,created_at';
+  const rows = invCache.map(i => [i.nickname, i.grant_type, i.state, i.expires_at, i.created_at]
     .map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
   const csv = [head, ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'convites-ec.csv';
+  a.download = 'passkey-grants-status.csv';
   a.click();
   URL.revokeObjectURL(a.href);
 }
