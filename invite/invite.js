@@ -75,11 +75,29 @@
     ['loading', 'error', 'form', 'success'].forEach(function (part) {
       document.getElementById(part + '-state').classList.toggle('hidden', part !== name);
     });
+    document.getElementById('loading-state').setAttribute('aria-busy', name === 'loading' ? 'true' : 'false');
   }
 
   function showError(message) {
+    var chip = document.getElementById('error-status-chip');
+    var title = document.getElementById('error-title');
+    if (/j[aá] foi usado|expirou/i.test(message)) {
+      chip.textContent = 'LINK ENCERRADO';
+      title.textContent = 'LINK ENCERRADO';
+    } else if (/inv[aá]lido/i.test(message)) {
+      chip.textContent = 'LINK INVÁLIDO';
+      title.textContent = 'LINK INVÁLIDO';
+    } else {
+      chip.textContent = 'NÃO FOI POSSÍVEL VERIFICAR';
+      title.textContent = 'NÃO FOI POSSÍVEL CONTINUAR';
+    }
     document.getElementById('error-message').textContent = message;
     showState('error');
+  }
+
+  function keepValidationVisible(startedAt) {
+    var remaining = 520 - (Date.now() - startedAt);
+    return remaining > 0 ? new Promise(function (resolve) { window.setTimeout(resolve, remaining); }) : Promise.resolve();
   }
 
   function showStep(name, number) {
@@ -185,19 +203,24 @@
   });
 
   async function initializeActivation() {
+    var validationStartedAt = Date.now();
     if (!/^[a-f0-9]{64}$/.test(token)) {
+      await keepValidationVisible(validationStartedAt);
       showError('Este link de ativação é inválido. Peça um novo convite ao administrador.');
       return;
     }
     try {
       var status = await window.PasskeyClient.api('/activation/status', { token: token });
       if (!status.valid) {
+        await keepValidationVisible(validationStartedAt);
         showError('Este link já foi usado ou expirou. Solicite um novo acesso ao administrador.');
         return;
       }
+      await keepValidationVisible(validationStartedAt);
       showState('form');
       showStep('code', 1);
     } catch (exception) {
+      await keepValidationVisible(validationStartedAt);
       showError('Não foi possível validar este link agora. Tente novamente em instantes.');
     }
   }

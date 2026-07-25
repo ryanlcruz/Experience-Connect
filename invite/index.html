@@ -26,14 +26,38 @@
       </div>
     </aside>
     <section class="activation-workspace" aria-label="Ativação de acesso">
-    <section id="loading-state" class="state">
-      <p>Preparando a ativação segura…</p>
+    <section id="loading-state" class="state" role="status" aria-live="polite" aria-busy="true">
+      <div class="activation-status-card">
+        <span class="activation-status-chip">VALIDANDO LINK</span>
+        <div class="ec-loader activation-link-loader" style="width:88px;height:88px;color:var(--activation-ink)" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <g class="ecl-rays" stroke="var(--activation-yellow)" stroke-width="3" stroke-linecap="round">
+              <line x1="50" y1="6" x2="50" y2="15"/><line x1="94" y1="50" x2="85" y2="50"/>
+              <line x1="50" y1="94" x2="50" y2="85"/><line x1="6" y1="50" x2="15" y2="50"/>
+              <line x1="81" y1="19" x2="75" y2="25"/><line x1="81" y1="81" x2="75" y2="75"/>
+              <line x1="19" y1="81" x2="25" y2="75"/><line x1="19" y1="19" x2="25" y2="25"/>
+            </g>
+            <circle class="ecl-orbit" cx="50" cy="50" r="44"/>
+            <circle class="ecl-dot" cx="50" cy="6" r="4.5"/>
+            <g class="ecl-mark">
+              <path class="ecl-crown" d="M61 28 l3 -7 4 4.5 4 -7 3 8.5 z" fill="var(--activation-yellow)" stroke="var(--activation-yellow)" stroke-width="1" stroke-linejoin="round"/>
+              <rect class="ecl-mark-rect" x="30" y="34" width="40" height="36" rx="5"/>
+              <text class="ecl-mark-txt" x="50" y="59" font-family="DM Sans" font-weight="800" font-size="20" text-anchor="middle">EC</text>
+            </g>
+          </svg>
+        </div>
+        <h1 class="activation-status-title">Verificando seu link</h1>
+        <p class="activation-status-copy">Estamos preparando sua ativação.</p>
+      </div>
     </section>
 
     <section id="error-state" class="state hidden">
-      <img src="/frontend/assets/image/icons8-alert-96.apng.png" alt="" class="error-icon">
-      <h1 class="error-title">Não foi possível continuar</h1>
-      <p id="error-message" class="error-text"></p>
+      <div class="activation-status-card activation-status-card-error">
+        <span class="activation-status-chip" id="error-status-chip">LINK INDISPONÍVEL</span>
+        <img src="/frontend/assets/image/icons8-alert-96.apng.png" alt="" class="error-icon">
+        <h1 class="error-title" id="error-title">Não foi possível continuar</h1>
+        <p id="error-message" class="error-text"></p>
+      </div>
     </section>
 
     <section id="form-state" class="state hidden">

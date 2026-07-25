@@ -28,7 +28,7 @@ body.activation-page {
   min-height: 100dvh;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(440px, 580px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   overflow: hidden;
   background: var(--activation-paper);
 }
@@ -125,15 +125,15 @@ body.activation-page {
   align-items: center;
   justify-content: center;
   min-height: 100dvh;
-  padding: clamp(36px, 6vh, 72px) clamp(28px, 5vw, 56px);
+  padding: clamp(40px, 6vh, 76px) clamp(36px, 6vw, 96px);
   border-left: 2px solid var(--activation-ink);
-  background: var(--activation-paper);
+  background: #fff;
 }
 
 .activation-page .activation-workspace .state {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 560px;
   padding: 0;
   overflow: visible;
   border: 0;
@@ -157,15 +157,91 @@ body.activation-page {
 }
 
 .activation-page #loading-state {
-  padding: 48px 0;
+  padding: 0;
 }
 
-.activation-page #loading-state p {
+.activation-status-card {
+  position: relative;
+  width: 100%;
+  min-height: 352px;
+  padding: 44px 36px 40px;
+  overflow: hidden;
+  border: 3px solid var(--activation-ink);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 8px 8px 0 var(--activation-ink);
+  text-align: center;
+}
+
+.activation-status-card::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: var(--activation-yellow);
+  content: '';
+}
+
+.activation-status-chip {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: var(--activation-ink);
+  color: #fff;
+  font-family: var(--activation-font);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  line-height: 1;
+}
+
+.activation-link-loader {
+  display: block;
+  margin: 22px auto 18px;
+}
+
+.activation-status-title {
+  margin: 0 0 8px;
+  color: var(--activation-ink);
+  font-family: var(--activation-display);
+  font-size: 38px;
+  font-weight: 400;
+  line-height: .95;
+  text-transform: uppercase;
+}
+
+.activation-status-copy {
   margin: 0;
   color: #48443F;
   font-family: var(--activation-font);
   font-size: 14px;
-  font-weight: 600;
+  line-height: 1.5;
+}
+
+.activation-status-card-error {
+  display: flex;
+  min-height: 320px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.activation-status-card-error .error-icon {
+  width: 72px;
+  height: 72px;
+  margin: 20px auto 16px;
+}
+
+.activation-status-card-error .error-title {
+  margin: 0 0 10px;
+  font-size: 38px;
+}
+
+.activation-status-card-error .error-text {
+  margin: 0;
 }
 
 .activation-page .invite-header {
@@ -697,7 +773,7 @@ body.activation-page {
     min-height: 100dvh;
     padding: 64px 32px;
     border: 0;
-    background: transparent;
+    background: #fff;
   }
 }
 
@@ -771,6 +847,16 @@ body.activation-page {
 
   .activation-page .passkey-guide {
     margin-bottom: 18px;
+  }
+
+  .activation-status-card {
+    min-height: 320px;
+    padding: 36px 24px 32px;
+  }
+
+  .activation-status-title,
+  .activation-status-card-error .error-title {
+    font-size: 34px;
   }
 }
 
