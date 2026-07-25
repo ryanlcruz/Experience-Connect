@@ -1,0 +1,64 @@
+{
+  "game_key": "duelo-de-experiencia",
+  "version": "1.0.0",
+  "title": "Duelo de Experi\u00eancia",
+  "rounds": 5,
+  "cards": {
+    "empatia": {"name": "Empatia", "type": "cx", "response": 18, "resolution": 7, "keywords": ["Escuta", "Cuidado"], "effect": "Recupera Confian\u00e7a ao acolher o impacto."},
+    "escuta-ativa": {"name": "Escuta Ativa", "type": "cx", "response": 16, "resolution": 10, "keywords": ["Escuta", "Investiga\u00e7\u00e3o"], "effect": "Prepara uma resposta com contexto."},
+    "transparencia": {"name": "Transpar\u00eancia", "type": "cx", "response": 14, "resolution": 13, "keywords": ["Clareza", "Escuta"], "effect": "Remove Desconfian\u00e7a quando cont\u00e9m a amea\u00e7a."},
+    "comunicacao-clara": {"name": "Comunica\u00e7\u00e3o Clara", "type": "cx", "response": 13, "resolution": 12, "keywords": ["Clareza", "Colabora\u00e7\u00e3o"], "effect": "Alinha os pr\u00f3ximos passos."},
+    "follow-up": {"name": "Follow-up", "type": "cx", "response": 12, "resolution": 14, "keywords": ["Ownership", "Planejamento"], "effect": "Mant\u00e9m o compromisso vis\u00edvel."},
+    "investigacao": {"name": "Investiga\u00e7\u00e3o", "type": "cx", "response": 17, "resolution": 9, "keywords": ["Investiga\u00e7\u00e3o", "Clareza"], "effect": "Exp\u00f5e a causa real do problema."},
+    "colaboracao": {"name": "Colabora\u00e7\u00e3o", "type": "ex", "response": 15, "resolution": 11, "keywords": ["Colabora\u00e7\u00e3o", "Ownership"], "effect": "Divide a responsabilidade pela resposta."},
+    "reconhecimento": {"name": "Reconhecimento", "type": "ex", "response": 14, "resolution": 10, "keywords": ["Cuidado", "Colabora\u00e7\u00e3o"], "effect": "Recupera energia do time."},
+    "bem-estar": {"name": "Bem-estar", "type": "ex", "response": 20, "resolution": 4, "keywords": ["Cuidado", "Prote\u00e7\u00e3o"], "effect": "Protege a Confian\u00e7a, mas resolve pouco."},
+    "autonomia": {"name": "Autonomia", "type": "ex", "response": 12, "resolution": 11, "keywords": ["Autonomia", "Ownership"], "effect": "Libera uma a\u00e7\u00e3o com responsabilidade."},
+    "feedback": {"name": "Feedback", "type": "ex", "response": 15, "resolution": 10, "keywords": ["Escuta", "Clareza"], "effect": "Transforma sinal em melhoria."},
+    "desenvolvimento": {"name": "Desenvolvimento", "type": "ex", "response": 13, "resolution": 12, "keywords": ["Autonomia", "Planejamento"], "effect": "Prepara o time para a pr\u00f3xima rodada."},
+    "priorizacao": {"name": "Prioriza\u00e7\u00e3o", "type": "strategy", "response": 14, "resolution": 15, "keywords": ["Planejamento", "Agilidade"], "effect": "Foca o que move a resolu\u00e7\u00e3o."},
+    "planejamento": {"name": "Planejamento", "type": "strategy", "response": 15, "resolution": 12, "keywords": ["Planejamento", "Prote\u00e7\u00e3o"], "effect": "Reduz o risco da pr\u00f3xima decis\u00e3o."},
+    "gestao-de-crise": {"name": "Gest\u00e3o de Crise", "type": "strategy", "response": 16, "resolution": 16, "keywords": ["Prote\u00e7\u00e3o", "Agilidade"], "effect": "Cont\u00e9m impacto e organiza a resposta."},
+    "alinhamento": {"name": "Alinhamento", "type": "strategy", "response": 16, "resolution": 10, "keywords": ["Clareza", "Colabora\u00e7\u00e3o"], "effect": "Conecta decis\u00e3o e contexto."},
+    "escalonamento": {"name": "Escalonamento", "type": "strategy", "response": 12, "resolution": 18, "keywords": ["Ownership", "Agilidade"], "effect": "Aciona a inst\u00e2ncia certa."},
+    "resolucao-rapida": {"name": "Resolu\u00e7\u00e3o R\u00e1pida", "type": "strategy", "response": 6, "resolution": 22, "keywords": ["Agilidade"], "effect": "Resolve depressa, mas exige planejamento.", "risk": "Sem Planejamento, cria Sobrecarga."}
+  },
+  "scenarios": [
+    {
+      "id": "cliente-irritado", "name": "Cliente Irritado", "category": "CX", "rule": "Agilidade sem Escuta aplica Desconfian\u00e7a.",
+      "loadout": ["empatia", "escuta-ativa", "transparencia", "follow-up", "resolucao-rapida", "comunicacao-clara", "investigacao", "planejamento"],
+      "combos": [{"cards": ["escuta-ativa", "transparencia"], "name": "Confian\u00e7a Recuperada", "trust": 8, "pressure": 5}],
+      "threats": [
+        {"id": "reclamacao-inicial", "name": "Reclama\u00e7\u00e3o inicial", "impact": 14, "vulnerabilities": ["Escuta"], "consequence": "Insatisfa\u00e7\u00e3o", "copy": "O cliente relata que ningu\u00e9m ouviu o problema."},
+        {"id": "promessa-quebrada", "name": "Promessa quebrada", "impact": 22, "vulnerabilities": ["Clareza", "Ownership"], "consequence": "Desconfian\u00e7a", "copy": "O compromisso assumido n\u00e3o foi cumprido."},
+        {"id": "reclamacao-publica", "name": "Reclama\u00e7\u00e3o p\u00fablica", "impact": 24, "vulnerabilities": ["Clareza", "Cuidado"], "consequence": "Exposi\u00e7\u00e3o", "copy": "A insatisfa\u00e7\u00e3o agora alcan\u00e7ou outras pessoas."},
+        {"id": "plano-cobrado", "name": "Plano cobrado", "impact": 18, "vulnerabilities": ["Planejamento", "Ownership"], "consequence": "Press\u00e3o", "copy": "O cliente aceita conversar, mas exige um caminho concreto."},
+        {"id": "risco-ruptura", "name": "Risco de ruptura", "impact": 28, "vulnerabilities": ["Escuta", "Clareza", "Ownership"], "consequence": "Ruptura", "copy": "A rela\u00e7\u00e3o chega ao seu ponto mais fr\u00e1gil."}
+      ]
+    },
+    {
+      "id": "prioridades-conflito", "name": "Prioridades em Conflito", "category": "EX", "rule": "A\u00e7\u00f5es CX sem prepara\u00e7\u00e3o EX perdem Resposta.",
+      "loadout": ["colaboracao", "feedback", "autonomia", "alinhamento", "priorizacao", "planejamento", "comunicacao-clara", "reconhecimento"],
+      "combos": [{"cards": ["feedback", "reconhecimento"], "name": "Ciclo Positivo", "trust": 7, "pressure": 4}],
+      "threats": [
+        {"id": "objetivos-divergentes", "name": "Objetivos divergentes", "impact": 15, "vulnerabilities": ["Clareza", "Colabora\u00e7\u00e3o"], "consequence": "Atrito", "copy": "As equipes perseguem resultados que competem entre si."},
+        {"id": "sobrecarga-time", "name": "Sobrecarga do time", "impact": 20, "vulnerabilities": ["Cuidado", "Prioriza\u00e7\u00e3o"], "consequence": "Sobrecarga", "copy": "Tudo virou prioridade e o time perdeu f\u00f4lego."},
+        {"id": "virada-alinhamento", "name": "Mudanca de rota", "impact": 23, "vulnerabilities": ["Planejamento", "Autonomia"], "consequence": "Desorienta\u00e7\u00e3o", "copy": "Uma nova demanda altera o que era combinado."},
+        {"id": "decisao-bloqueada", "name": "Decisao bloqueada", "impact": 18, "vulnerabilities": ["Ownership", "Agilidade"], "consequence": "Paralisia", "copy": "A decis\u00e3o certa n\u00e3o tem dono."},
+        {"id": "desgaste-coletivo", "name": "Desgaste coletivo", "impact": 27, "vulnerabilities": ["Colabora\u00e7\u00e3o", "Cuidado", "Clareza"], "consequence": "Desengajamento", "copy": "O conflito come\u00e7a a afetar a experi\u00eancia do time."}
+      ]
+    },
+    {
+      "id": "crise-operacional", "name": "Crise Operacional", "category": "ESTRAT\u00c9GIA", "rule": "A crise tem um ponto de virada na terceira rodada.",
+      "loadout": ["gestao-de-crise", "planejamento", "priorizacao", "escalonamento", "resolucao-rapida", "investigacao", "autonomia", "alinhamento"],
+      "combos": [{"cards": ["planejamento", "priorizacao"], "name": "Execu\u00e7\u00e3o Coordenada", "trust": 4, "pressure": 8}],
+      "threats": [
+        {"id": "sinal-falha", "name": "Sinal de falha", "impact": 16, "vulnerabilities": ["Investiga\u00e7\u00e3o", "Planejamento"], "consequence": "Incerteza", "copy": "O processo mostra sinais de instabilidade."},
+        {"id": "operacao-lenta", "name": "Operacao lenta", "impact": 19, "vulnerabilities": ["Agilidade", "Ownership"], "consequence": "Fila", "copy": "A opera\u00e7\u00e3o perde ritmo e o impacto cresce."},
+        {"id": "falha-critica", "name": "Falha critica", "impact": 28, "vulnerabilities": ["Prote\u00e7\u00e3o", "Planejamento", "Agilidade"], "consequence": "Falha critica", "copy": "A falha se espalha. Este \u00e9 o ponto de virada do cen\u00e1rio."},
+        {"id": "ruido-comunicacao", "name": "Ruido de comunicacao", "impact": 18, "vulnerabilities": ["Clareza", "Colabora\u00e7\u00e3o"], "consequence": "Retrabalho", "copy": "Times reagem com informa\u00e7\u00f5es diferentes."},
+        {"id": "impacto-cascata", "name": "Impacto em cascata", "impact": 29, "vulnerabilities": ["Prote\u00e7\u00e3o", "Ownership", "Agilidade"], "consequence": "Parada", "copy": "A \u00faltima amea\u00e7a exige uma resposta coordenada."}
+      ]
+    }
+  ]
+}

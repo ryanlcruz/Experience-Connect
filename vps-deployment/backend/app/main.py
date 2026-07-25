@@ -74,6 +74,9 @@ app.include_router(internal.router, prefix="/api/internal", tags=["Internal"])
 from app.api import redeem
 app.include_router(redeem.router, prefix="/api/redeem", tags=["Redeem"])
 
+from app.api import daily_games
+app.include_router(daily_games.router, prefix="/api/daily-games", tags=["Daily Games"])
+
 from app.api import auth
 app.include_router(auth.router, prefix="/api/auth", tags=["Passkeys"])
 
