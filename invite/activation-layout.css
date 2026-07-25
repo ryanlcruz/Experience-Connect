@@ -44,6 +44,10 @@ body.activation-page {
   background: var(--activation-paper);
 }
 
+.activation-scene--invite {
+  background: #F7E6CE;
+}
+
 .activation-scene::after {
   position: absolute;
   inset: 0;
