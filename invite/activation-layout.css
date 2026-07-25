@@ -156,8 +156,29 @@ body.activation-page {
   text-align: center;
 }
 
-.activation-page #loading-state {
-  padding: 0;
+.activation-page .activation-workspace #loading-state,
+.activation-page .activation-workspace #error-state {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  width: auto;
+  max-width: none;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 32px;
+  background: var(--activation-paper);
+}
+
+.activation-page .activation-workspace #loading-state.hidden,
+.activation-page .activation-workspace #error-state.hidden {
+  display: none;
+}
+
+.activation-page .activation-workspace #loading-state .activation-status-card,
+.activation-page .activation-workspace #error-state .activation-status-card {
+  width: min(560px, 100%);
+  justify-self: center;
 }
 
 .activation-status-card {
