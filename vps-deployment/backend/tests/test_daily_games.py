@@ -77,6 +77,18 @@ class DailyGameReplayTests(unittest.TestCase):
         public = daily_games._public_scenario(scenario)
         self.assertEqual(set(public), {"id", "name", "category", "rule"})
 
+    def test_history_reveals_only_resolved_confrontations(self):
+        scenario = self.scenario("cliente-irritado")
+        run = daily_games._new_run("user-123", self.script, scenario)
+        daily_games._apply_round(self.script, scenario, run, "empatia")
+        run["round"] = 2
+        public = daily_games._public_state(self.script, scenario, run)
+        history = public["round_history"]
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]["threat"]["id"], "reclamacao-inicial")
+        self.assertEqual(history[0]["card"]["id"], "empatia")
+        self.assertNotIn("threats", history[0])
+
 
 if __name__ == "__main__":
     unittest.main()

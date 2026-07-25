@@ -14,6 +14,7 @@ import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel, Field
@@ -28,6 +29,7 @@ router = APIRouter()
 GAME_KEY = "duelo-de-experiencia"
 RUN_TTL_SECONDS = 30 * 60
 MAX_ROUNDS = 5
+GAME_TIMEZONE = ZoneInfo("America/Sao_Paulo")
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "data" / "daily_games" / "duelo-de-experiencia.v1.json"
 
 
@@ -101,6 +103,23 @@ def _public_threat(scenario: dict[str, Any], round_number: int) -> dict[str, Any
     return {key: threat[key] for key in ("id", "name", "impact", "vulnerabilities", "consequence", "copy")}
 
 
+def _game_date() -> str:
+    return datetime.now(GAME_TIMEZONE).date().isoformat()
+
+
+def _public_round(script: dict[str, Any], scenario: dict[str, Any], row: dict[str, Any]) -> dict[str, Any]:
+    threat = _public_threat(scenario, int(row["round"])) or {}
+    card = _public_card(row["card_id"], script["cards"][row["card_id"]])
+    return {
+        "round": row["round"],
+        "threat": {key: threat[key] for key in ("id", "name", "impact")},
+        "card": {key: card[key] for key in ("id", "name", "type", "keywords")},
+        "remaining_impact": row["remaining_impact"],
+        "perfect": row["perfect"],
+        "combo": row.get("combo"),
+    }
+
+
 def _new_run(user_id: str, script: dict[str, Any], scenario: dict[str, Any]) -> dict[str, Any]:
     loadout = list(scenario.get("loadout") or [])
     if len(loadout) < MAX_ROUNDS + 1 or len(scenario.get("threats") or []) != MAX_ROUNDS:
@@ -134,22 +153,19 @@ def _public_state(script: dict[str, Any], scenario: dict[str, Any], run: dict[st
         "conditions": list(run.get("conditions") or []),
         "hand": [_public_card(card_id, cards[card_id]) for card_id in run["hand"]],
         "threat": _public_threat(scenario, run["round"]),
-        "round_history": [
-            {"round": row["round"], "remaining_impact": row["remaining_impact"]}
-            for row in run.get("rounds") or []
-        ],
+        "round_history": [_public_round(script, scenario, row) for row in run.get("rounds") or []],
         "reorganize_available": bool(not run.get("reorganize_used") and run.get("deck")),
     }
 
 
-async def _assert_not_completed(user_id: str) -> None:
+async def _completed_run_for_today(user_id: str) -> dict[str, Any] | None:
     try:
         rows = (
             supabase_client.table("daily_game_runs")
-            .select("id")
+            .select("outcome,score,trust_remaining,pressure_remaining,completed_at")
             .eq("user_id", user_id)
             .eq("game_key", GAME_KEY)
-            .eq("game_date", datetime.now(timezone.utc).date().isoformat())
+            .eq("game_date", _game_date())
             .limit(1)
             .execute()
             .data
@@ -158,7 +174,11 @@ async def _assert_not_completed(user_id: str) -> None:
     except Exception as exc:
         logger.error("daily game completion lookup failed user_id=%s: %s", user_id, exc)
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Nao foi possivel verificar o jogo diario")
-    if rows:
+    return rows[0] if rows else None
+
+
+async def _assert_not_completed(user_id: str) -> None:
+    if await _completed_run_for_today(user_id):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Jogo diario ja concluido")
 
 
@@ -316,7 +336,7 @@ async def _record_result(user_id: str, run_id: str, version: str, result: dict[s
         "game_key": GAME_KEY,
         "game_version": version,
         "run_id": run_id,
-        "game_date": datetime.now(timezone.utc).date().isoformat(),
+        "game_date": _game_date(),
         **result,
     }
     try:
@@ -335,12 +355,14 @@ async def get_manifest(response: Response, session_user: dict = Depends(require_
     """Only public scenario labels; no future threats or private deck data."""
     _private_response(response)
     script = _load_script()
+    completed = await _completed_run_for_today(session_user["sub"])
     return {
         "game_key": GAME_KEY,
         "version": script["version"],
         "title": script["title"],
         "rounds": script["rounds"],
         "scenarios": [_public_scenario(scenario) for scenario in script["scenarios"]],
+        "daily_status": {"state": "completed", "result": _public_result(completed)} if completed else {"state": "available"},
     }
 
 

@@ -90,7 +90,7 @@
 
     .dx-shell {
       position: relative; z-index: 1;
-      width: min(100%, 1120px); min-height: 100vh;
+      width: min(100%, 1280px); min-height: 100vh;
       margin: 0 auto; padding: 24px 16px;
       display: grid; grid-template-rows: auto 1fr; gap: 24px;
     }
@@ -147,6 +147,11 @@
     .dx-panel.is-wide { width: min(100%, 860px); min-height: 590px; }
     .dx-panel.is-wide .dx-panel-inner { padding: 20px 24px; }
     .dx-panel-inner { position: relative; z-index: 1; padding: 32px; }
+    .dx-panel.is-game-screen {
+      width:100%; min-height:0; border:0; border-radius:0; background:transparent; box-shadow:none; overflow:visible;
+    }
+    .dx-panel.is-game-screen .dx-panel-inner { padding:0; }
+    .dx-panel.is-game-screen .dx-crease { display:none; }
 
     /* Signature crease - Neobrutalist folded corner */
     .dx-crease {
@@ -335,6 +340,16 @@
       animation: card-slam 1.5s cubic-bezier(.18,.9,.2,1) forwards;
       z-index: 50;
     }
+    .dx-field-card.is-selected {
+      transform: translateY(-8px) rotate(-1deg);
+      z-index: 3;
+    }
+    .dx-field-card.is-selected .dx-field-card-back { transform: rotateY(180deg); }
+    .dx-field-card.is-selected .dx-field-card-front {
+      transform: rotateY(0deg);
+      border-color: var(--y);
+      box-shadow: var(--s3);
+    }
 
     .dx-field-card-back, .dx-field-card-front {
       position: absolute; inset: 0; backface-visibility: hidden;
@@ -376,6 +391,14 @@
       margin: 5px 0 0; font-size: 10px; line-height: 1.4;
       color: var(--n5); flex: 1; font-weight: 500;
     }
+    .dx-field-confirmation {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px;
+      margin: 18px auto 0; max-width: 520px; padding: 14px 16px;
+      background: var(--ow2); border: var(--b2); border-radius: var(--r2); box-shadow: var(--s2);
+      animation: dxFadeUp 200ms var(--spring) both;
+    }
+    .dx-field-confirmation strong { display: block; font-family: var(--fb); font-size: 26px; line-height: .9; text-transform: uppercase; }
+    .dx-field-confirmation span { display: block; margin-top: 4px; font-family: var(--fm); font-size: 9px; font-weight: 700; color: var(--n5); text-transform: uppercase; }
 
     /* Slam Reveal Effects */
     .dx-panel.is-hit {
@@ -915,11 +938,8 @@
     }
 
     /* === DUEL 2.0: AMEACA, RESPOSTA E CONSEQUENCIA === */
-    .dx-panel.is-duel {
-      width: min(100%, 1080px);
-      min-height: min(720px, calc(100dvh - 112px));
-    }
-    .dx-panel.is-duel .dx-panel-inner { padding: 18px 22px; }
+    .dx-panel.is-duel { min-height:0; }
+    .dx-panel.is-duel .dx-panel-inner { padding:0; }
     .dx-arena-v2 { display: grid; gap: 12px; }
     .dx-duel-hud {
       display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -943,7 +963,7 @@
     .dx-hud-fill--trust { background: var(--ok); }
     .dx-round-count { color: var(--y); text-align: center; white-space: nowrap; }
 
-    .dx-duel-board { display: grid; grid-template-columns: 188px minmax(0, 1fr); gap: 14px; min-height: 338px; }
+    .dx-duel-board { display: grid; grid-template-columns: 188px minmax(0, 1fr); gap: 14px; min-height: 0; }
     .dx-scenario-panel {
       display: flex; flex-direction: column; gap: 12px; padding: 16px;
       background: var(--ow2); border: var(--b2); border-radius: var(--r2); box-shadow: var(--s1);
@@ -964,13 +984,24 @@
     .dx-round-chip.is-risk { color: var(--er); border-color: var(--er); }
     .dx-round-chip.is-current { color: var(--k); background: var(--y); }
 
-    .dx-threat-zone { display: grid; grid-template-rows: 1fr auto; gap: 11px; min-width: 0; }
+    .dx-battle-zone { display: grid; gap: 9px; min-width: 0; }
+    .dx-battle-heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+    .dx-battle-heading span, .dx-battle-history-title { font-family:var(--fm); font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--n5); }
+    .dx-battle-heading p { font-size:10px; color:var(--n4); text-align:right; }
+    .dx-battlefield { display:grid; grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr); align-items:stretch; gap:10px; }
+    .dx-battle-vs { display:grid; place-items:center; font-family:var(--fb); font-size:24px; color:var(--n4); }
     .dx-threat-card {
-      display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px;
-      min-height: 142px; padding: 18px; background: var(--k2); color: var(--w);
+      display: grid; grid-template-columns: 116px minmax(0, 1fr) auto; align-items: center; gap: 18px;
+      min-height: 208px; padding: 16px; background: var(--k2); color: var(--w);
       border: var(--b2); border-radius: var(--r3); box-shadow: var(--s2); animation: dxThreatEnter .35s var(--spring) both;
     }
-    .dx-threat-badge { display: grid; place-items: center; width: 48px; height: 48px; border: var(--b2); border-radius: var(--r2); background: var(--er); color: var(--k); font-family: var(--fb); font-size: 27px; }
+    .dx-sentury-actor { display: grid; justify-items: center; gap: 7px; padding-right: 16px; border-right: 1px solid var(--k4); text-align: center; }
+    .dx-sentury-face { width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid var(--y); border-radius: 50%; background: var(--k); }
+    .dx-sentury-eye { width: 7px; height: 19px; border-radius: 4px; background: var(--w); animation: dxSenturyEye 7s ease-in-out infinite; }
+    .dx-sentury-eye:nth-child(2) { animation-delay: .12s; }
+    .dx-sentury-actor.is-evaluating .dx-sentury-eye { animation: dxSenturyEvaluate .36s ease-in-out infinite alternate; }
+    .dx-sentury-name { font-family: var(--fd); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--w); }
+    .dx-sentury-status { font-family: var(--fm); font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--y); }
     .dx-threat-kicker { font-family: var(--fm); font-size: 9px; color: var(--y); font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
     .dx-threat-name { margin: 3px 0 5px; font-family: var(--fb); font-size: clamp(28px, 4vw, 42px); line-height: .9; text-transform: uppercase; }
     .dx-threat-copy { font-size: 12px; color: var(--n2); line-height: 1.35; }
@@ -980,48 +1011,72 @@
     .dx-vulnerability { font-family: var(--fm); font-size: 9px; color: var(--y); line-height: 1.45; }
 
     .dx-response-stage {
-      min-height: 104px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
-      padding: 12px 14px; border: 2px dashed var(--n3); border-radius: var(--r2); background: var(--w);
+      min-height: 208px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+      padding: 16px; border: 2px dashed var(--n3); border-radius: var(--r3); background: var(--ow2);
     }
-    .dx-response-stage.is-selected { border-style: solid; border-color: var(--y); box-shadow: 0 0 0 3px var(--y4); }
-    .dx-response-placeholder { color: var(--n4); font-size: 12px; text-align: center; }
+    .dx-response-stage.is-selected { border-style: solid; border-color: var(--y); background:var(--w); box-shadow: var(--s2); }
+    .dx-player-slot { display:grid; gap:8px; text-align:center; justify-items:center; color:var(--n4); }
+    .dx-player-slot-label { font-family:var(--fm); font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--n4); }
+    .dx-player-slot strong { font-family:var(--fb); font-size:27px; line-height:.9; text-transform:uppercase; color:var(--k); }
+    .dx-player-slot p { max-width:220px; font-size:11px; line-height:1.4; }
     .dx-response-preview { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; }
-    .dx-preview-emblem { width: 52px; height: 52px; display: grid; place-items: center; border: var(--b2); border-radius: var(--r2); background: var(--y4); font-size: 25px; }
+    .dx-preview-emblem { width: 52px; height: 52px; display: grid; place-items: center; border: var(--b2); border-radius: var(--r2); background: var(--k2); color:var(--y); }
+    .dx-preview-emblem svg { width:27px; height:27px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .dx-preview-title { font-family: var(--fb); font-size: 25px; line-height: .9; text-transform: uppercase; }
     .dx-preview-details { margin-top: 4px; font-family: var(--fm); font-size: 10px; color: var(--n5); line-height: 1.45; }
     .dx-preview-details .is-match { color: var(--ok); font-weight: 700; }
     .dx-preview-risk { color: var(--wn); }
     .dx-response-actions { display: flex; align-items: center; gap: 8px; }
+    .dx-battle-history-wrap { display:grid; gap:6px; padding-top:2px; }
+    .dx-battle-history { display:flex; flex-wrap:wrap; gap:6px; }
+    .dx-history-match { display:grid; grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr) auto; align-items:center; gap:5px; max-width:100%; padding:5px 7px; border:var(--b1); border-radius:var(--r1); background:var(--w); font-family:var(--fm); font-size:8px; }
+    .dx-history-round { color:var(--n4); font-weight:700; }
+    .dx-history-card { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--k); font-weight:700; }
+    .dx-history-card--enemy { color:var(--er); }
+    .dx-history-vs { color:var(--n4); }
+    .dx-history-result { color:var(--n4); }
+    .dx-history-match.is-contained .dx-history-result { color:var(--ok); }
+    .dx-history-match.is-impact .dx-history-result { color:var(--er); }
+    .dx-history-empty { font-size:10px; color:var(--n4); }
 
     .dx-hand-wrap { display: grid; gap: 7px; }
     .dx-hand-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .dx-hand-title strong { font-family: var(--fb); font-size: 22px; text-transform: uppercase; font-weight: 400; }
     .dx-hand-title span { font-family: var(--fm); color: var(--n4); font-size: 9px; font-weight: 700; text-transform: uppercase; }
-    .dx-response-hand { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
+    .dx-response-hand { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
     .dx-response-card {
-      min-width: 0; min-height: 156px; display: grid; grid-template-rows: 5px auto 1fr auto;
-      padding: 0; overflow: hidden; text-align: left; border: var(--b2); border-radius: var(--r2); background: var(--w); box-shadow: var(--s1); cursor: pointer;
-      transition: transform .16s var(--spring), box-shadow .16s ease, border-color .16s ease, background .16s ease;
+      position: relative; min-width: 0; min-height: 178px; padding: 0; overflow: hidden; text-align: left;
+      border: var(--b2); border-radius: var(--r3); background: var(--ow); box-shadow: var(--s2); cursor: pointer;
+      transition: transform .15s var(--spring), box-shadow .15s ease, border-color .15s ease, background .15s ease;
     }
-    .dx-response-card:hover, .dx-response-card:focus-visible, .dx-response-card.is-selected { transform: translateY(-8px); border-color: var(--y); box-shadow: var(--s3); outline: none; }
+    .dx-response-card::after { content:''; position:absolute; right:-2px; bottom:-2px; width:22px; height:22px; background:var(--y); border-top:var(--b2); border-left:var(--b2); clip-path:polygon(100% 0,100% 100%,0 100%); }
+    .dx-response-card:hover, .dx-response-card:focus-visible, .dx-response-card.is-selected { transform: translateY(-6px); border-color: var(--y); box-shadow: var(--s3); outline: none; }
     .dx-response-card.is-selected { background: var(--y4); }
-    .dx-response-card__stripe { background: var(--cc); }
-    .dx-response-card__body { display: grid; gap: 7px; padding: 9px; }
-    .dx-response-card__top { display: flex; justify-content: space-between; align-items: start; gap: 5px; }
-    .dx-response-card__type { font-family: var(--fm); font-size: 8px; font-weight: 700; letter-spacing: .08em; color: var(--cc); text-transform: uppercase; }
-    .dx-response-card__emoji { font-size: 19px; line-height: 1; }
-    .dx-response-card__name { font-family: var(--fb); font-size: 21px; line-height: .88; text-transform: uppercase; }
+    .dx-response-card__head { min-height: 44px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; background:var(--k2); border-bottom:var(--b2); }
+    .dx-response-card__type { font-family: var(--fm); font-size: 8px; font-weight: 700; letter-spacing: .1em; color: var(--y); text-transform: uppercase; }
+    .dx-response-card__glyph { width:26px; height:26px; display:grid; place-items:center; border:1.5px solid rgba(255,199,0,.55); border-radius:var(--r1); color:var(--y); }
+    .dx-response-card__glyph svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .dx-response-card__body { display: grid; align-content:start; gap: 7px; padding: 11px 11px 13px; }
+    .dx-response-card__name { font-family: var(--fb); font-size: 24px; line-height: .88; text-transform: uppercase; }
+    .dx-response-card__effect { min-height:30px; font-size:10px; line-height:1.35; color:var(--n5); }
     .dx-response-card__keywords { font-family: var(--fm); font-size: 8px; color: var(--n4); line-height: 1.35; text-transform: uppercase; }
-    .dx-response-card__numbers { display: flex; gap: 5px; font-family: var(--fm); font-size: 9px; font-weight: 700; }
-    .dx-response-card__numbers span { flex: 1; padding: 4px; border: var(--b1); border-radius: var(--r1); background: var(--ow2); text-align: center; }
-    .dx-response-card__numbers b { color: var(--cc); }
+    .dx-response-card__numbers { display:flex; gap:6px; margin-top:auto; font-family:var(--fm); font-size:7px; font-weight:700; text-transform:uppercase; }
+    .dx-response-card__numbers span { display:grid; gap:1px; flex:1; padding:5px 4px; border:var(--b1); border-radius:var(--r1); background:var(--w); text-align:center; color:var(--n4); }
+    .dx-response-card__numbers b { color:var(--k); font-size:12px; line-height:1; }
     .dx-reorganize { justify-self: end; }
 
     .dx-resolution-note { min-height: 34px; text-align: center; font-family: var(--fm); font-size: 10px; font-weight: 700; color: var(--n5); }
     .dx-resolution-note.is-success { color: var(--ok); }
     .dx-resolution-note.is-danger { color: var(--er); }
+    .dx-panel.is-deal { min-height:0; }
+    .dx-deal-surface { padding:24px; background:var(--w); border:var(--b3); border-radius:var(--r4); box-shadow:var(--s4); }
+    .dx-completed-card { display:grid; gap:7px; justify-items:center; max-width:330px; margin:24px auto 16px; padding:20px; background:var(--k2); color:var(--w); border:var(--b2); border-radius:var(--r3); box-shadow:var(--s3); }
+    .dx-completed-card strong { font-family:var(--fb); font-size:46px; line-height:.85; color:var(--y); }
+    .dx-completed-card p { font-family:var(--fm); font-size:9px; color:rgba(255,255,255,.55); text-transform:uppercase; }
 
     @keyframes dxThreatEnter { from { opacity: 0; transform: translateY(-10px) rotate(-.5deg); } to { opacity: 1; transform: none; } }
+    @keyframes dxSenturyEye { 0%, 92%, 100% { transform:scaleY(1); } 95% { transform:scaleY(.15); } }
+    @keyframes dxSenturyEvaluate { from { transform:scaleY(.65); } to { transform:scaleY(1.1); } }
 
     /* === ANIMATIONS === */
     @keyframes dxFadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
@@ -1061,6 +1116,15 @@
 
     /* === RESPONSIVE === */
     @media (max-width: 700px) {
+      .dx-battlefield { grid-template-columns:1fr; gap:8px; }
+      .dx-battle-vs { min-height:28px; }
+      .dx-threat-card, .dx-response-stage { min-height:170px; }
+      .dx-threat-card { grid-template-columns:86px minmax(0,1fr); gap:12px; }
+      .dx-threat-meta { grid-column:2; justify-items:start; text-align:left; grid-auto-flow:column; align-items:center; }
+      .dx-sentury-actor { padding-right:10px; }
+      .dx-sentury-face { width:44px; height:44px; gap:8px; }
+      .dx-sentury-eye { width:6px; height:16px; }
+      .dx-field-confirmation { grid-template-columns:1fr; }
       .dx-field-grid { gap: 12px; }
       .dx-field-card { width: 116px; height: 176px; }
       .dx-field-name { font-size: 13px; }
@@ -1094,7 +1158,7 @@
       .dx-topbar { grid-template-columns: 1fr; justify-items: center; gap: 12px; }
       .dx-home-link { justify-self: center; }
       .dx-audio-btn { justify-self: center; }
-      .dx-battlefield { gap: 14px; min-height: 140px; }
+      .dx-battlefield { gap:8px; min-height:0; }
       .dx-bf-slot { width: 80px; min-height: 112px; }
       
       .dx-card { width: 72px; height: 102px; }
@@ -1162,29 +1226,7 @@
     const TYPE_COLORS = { cx: 'var(--info)', ex: 'var(--wn)', strategy: 'var(--p)', crisis: 'var(--er)' };
     const TYPE_LABELS = { cx: 'CX', ex: 'EX', strategy: 'ESTRATÉGIA', crisis: 'CRISE' };
 
-    const CARD_EMOJIS = {
-      // CX
-      'empatia': '🤝',
-      'escuta-ativa': '👂',
-      'transparencia': '🔍',
-      'comunicacao-clara': '📢',
-      'follow-up': '🔄',
-      'investigacao': '🕵️‍♂️',
-      // EX
-      'colaboracao': '👥',
-      'reconhecimento': '🏆',
-      'bem-estar': '🌱',
-      'autonomia': '🔓',
-      'feedback': '💬',
-      'desenvolvimento': '📈',
-      // Strategy
-      'priorizacao': '🎯',
-      'planejamento': '📅',
-      'gestao-de-crise': '🛡️',
-      'alinhamento': '⚖️',
-      'escalonamento': '🚀',
-      'resolucao-rapida': '⚡',
-    };
+    const CARD_EMOJIS = {};
 
     // O roteiro do adversário não existe no cliente. As ameaças, os baralhos e
     // os combos ficam exclusivamente na sessão privada da VPS.
@@ -1286,6 +1328,7 @@
     function render() {
       renderProgress();
       audioToggle.classList.toggle('dx-hidden', !state.sound);
+      document.querySelector('.dx-home-link')?.classList.toggle('dx-hidden', Boolean(state.dailyRun) && state.phase !== 'results');
       const renderers = {
         intro: renderIntro,
         field: renderFieldSelect,
@@ -1322,7 +1365,7 @@
       if (card.image) {
         return `<div class="dx-card-illustration theme-card-art" style="background-image: url('${card.image}');"></div>`;
       }
-      const emoji = CARD_EMOJIS[card.id] || '🃏';
+      const emoji = CARD_EMOJIS[card.id] || 'EC';
       return `<div class="dx-card-illustration"><div class="dx-card-emoji">${emoji}</div></div>`;
     }
 
@@ -2376,23 +2419,43 @@
       return { ...scenario, image: FIELD_ART[scenario.id] || FIELD_ART['cliente-irritado'] };
     }
 
+    function responseGlyph(type) {
+      const icons = {
+        cx: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h11v8H9l-4 3v-3H4z"/><path d="M17 9.5h3v7h-2v2l-3-2h-2"/></svg>',
+        ex: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3.5 19c.4-3.2 2.1-5 4.5-5s4.1 1.8 4.5 5"/><path d="M14 18c.3-2.4 1.5-3.8 3.5-3.8 1.5 0 2.7.9 3 2.8"/></svg>',
+        strategy: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"/></svg>'
+      };
+      return icons[type] || icons.strategy;
+    }
+
     function renderResponseCard(card, selected = false) {
-      const color = TYPE_COLORS[card.type] || 'var(--y)';
       const label = TYPE_LABELS[card.type] || card.type;
-      const emoji = CARD_EMOJIS[card.id] || '&#127183;';
-      return `<button class="dx-response-card${selected ? ' is-selected' : ''}" type="button" data-card-id="${escapeHtml(card.id)}" style="--cc:${color}">
-        <span class="dx-response-card__stripe"></span>
+      return `<button class="dx-response-card${selected ? ' is-selected' : ''}" type="button" data-card-id="${escapeHtml(card.id)}">
+        <span class="dx-response-card__head"><span class="dx-response-card__type">${escapeHtml(label)} &middot; resposta</span><span class="dx-response-card__glyph">${responseGlyph(card.type)}</span></span>
         <span class="dx-response-card__body">
-          <span class="dx-response-card__top"><span class="dx-response-card__type">${escapeHtml(label)}</span><span class="dx-response-card__emoji">${emoji}</span></span>
           <strong class="dx-response-card__name">${escapeHtml(card.name)}</strong>
+          <span class="dx-response-card__effect">${escapeHtml(card.effect)}</span>
           <span class="dx-response-card__keywords">${card.keywords.map(escapeHtml).join(' &middot; ')}</span>
-          <span class="dx-response-card__numbers"><span>&#128737; <b>${card.response}</b></span><span>&#9672; <b>${card.resolution}</b></span></span>
+          <span class="dx-response-card__numbers"><span>Resposta <b>${card.response}</b></span><span>Resolu&ccedil;&atilde;o <b>${card.resolution}</b></span></span>
         </span>
       </button>`;
     }
 
     function renderIntro() {
       const ready = Boolean(state.dailyManifest);
+      const completed = state.dailyManifest?.daily_status?.state === 'completed' ? state.dailyManifest.daily_status.result : null;
+      if (completed) {
+        panel(`
+          <div style="text-align:center">
+            <p class="dx-kicker">Daily Game &middot; conclu&iacute;do</p>
+            <h1 class="dx-title">Duelo de<br><strong>Experi&ecirc;ncia</strong></h1>
+            <div class="dx-completed-card"><span class="dx-tag">Jogo de hoje conclu&iacute;do</span><strong>${completed.score} XP</strong><p>Confian&ccedil;a ${completed.trust_remaining} &middot; Press&atilde;o ${completed.pressure_remaining}</p></div>
+            <p class="dx-result-sub">Amanh&atilde; um novo confronto estar&aacute; dispon&iacute;vel.</p>
+            <div class="dx-actions is-center" style="margin-top:24px"><button class="dx-btn is-secondary" onclick="location.href='/app'">Voltar</button></div>
+          </div>
+        `);
+        return;
+      }
       panel(`
         <div>
           <p class="dx-kicker">Daily Game</p>
@@ -2427,11 +2490,12 @@
 
     function renderFieldSelect() {
       const scenarios = (state.dailyManifest?.scenarios || []).map(scenarioWithArt);
+      const selected = scenarios.find((scenario) => scenario.id === state.selectedScenarioId) || null;
       panel(`
         <div class="dx-phase-head"><span class="dx-tag">Escolha do cen&aacute;rio</span></div>
-        <p style="color:var(--n5);font-size:14px;margin:0 0 8px;font-weight:600">Cada cen&aacute;rio tem amea&ccedil;as, regras e respostas relevantes.</p>
+        <p style="color:var(--n5);font-size:14px;margin:0 0 8px;font-weight:600">Escolha um cen&aacute;rio. A partida s&oacute; come&ccedil;a quando voc&ecirc; confirmar.</p>
         <div class="dx-field-grid" id="field-grid">
-          ${scenarios.map((scenario) => `<button class="dx-field-card" type="button" data-scenario-id="${escapeHtml(scenario.id)}" aria-label="Escolher ${escapeHtml(scenario.name)}">
+          ${scenarios.map((scenario) => `<button class="dx-field-card${selected?.id === scenario.id ? ' is-selected' : ''}" type="button" data-scenario-id="${escapeHtml(scenario.id)}" aria-label="Escolher ${escapeHtml(scenario.name)}">
             <span class="dx-field-card-back"><span class="dx-field-q">?</span></span>
             <span class="dx-field-card-front">
               <span class="dx-field-category">${escapeHtml(scenario.category)}</span>
@@ -2441,30 +2505,40 @@
             </span>
           </button>`).join('')}
         </div>
+        ${selected ? `<div class="dx-field-confirmation"><div><strong>${escapeHtml(selected.name)}</strong><span>${escapeHtml(selected.category)} &middot; cen&aacute;rio selecionado</span></div><button class="dx-btn dx-btn-y is-small" id="confirm-field" type="button">Confirmar cen&aacute;rio</button></div>` : ''}
       `);
+      document.getElementById('dx-panel')?.classList.add('is-game-screen');
       document.querySelectorAll('[data-scenario-id]').forEach((button) => {
-        button.addEventListener('click', async () => {
-          if (state.startingRun) return;
-          state.startingRun = true;
-          button.classList.add('is-chosen');
-          try {
-            const started = await dailyFetch('/api/daily-games/duelo-de-experiencia/start', {
-              method: 'POST', body: JSON.stringify({ scenario_id: button.dataset.scenarioId })
-            });
-            state.dailyRun = { run_id: started.run_id, version: started.version };
-            state.field = scenarioWithArt(started.scenario);
-            state.serverGame = started.state;
-            syncServerGame(started.state);
-            state.startingRun = false;
-            setPhase('distribute');
-          } catch (error) {
-            state.startingRun = false;
-            button.classList.remove('is-chosen');
-            const note = document.createElement('p');
-            note.className = 'dx-result-sub'; note.style.color = 'var(--er)'; note.textContent = error.message;
-            document.getElementById('field-grid')?.after(note);
-          }
+        button.addEventListener('click', () => {
+          if (state.startingRun || state.selectedScenarioId === button.dataset.scenarioId) return;
+          state.selectedScenarioId = button.dataset.scenarioId;
+          audio.playClick();
+          renderFieldSelect();
         });
+      });
+      document.getElementById('confirm-field')?.addEventListener('click', async () => {
+        if (!selected || state.startingRun) return;
+        state.startingRun = true;
+        const confirmation = document.getElementById('confirm-field');
+        if (confirmation) { confirmation.disabled = true; confirmation.textContent = 'Preparando...'; }
+        try {
+          const started = await dailyFetch('/api/daily-games/duelo-de-experiencia/start', {
+            method: 'POST', body: JSON.stringify({ scenario_id: selected.id })
+          });
+          state.dailyRun = { run_id: started.run_id, version: started.version };
+          state.field = scenarioWithArt(started.scenario);
+          state.serverGame = started.state;
+          state.selectedScenarioId = null;
+          syncServerGame(started.state);
+          state.startingRun = false;
+          setPhase('distribute');
+        } catch (error) {
+          state.startingRun = false;
+          if (confirmation) { confirmation.disabled = false; confirmation.textContent = 'Confirmar cenário'; }
+          const note = document.createElement('p');
+          note.className = 'dx-result-sub'; note.style.color = 'var(--er)'; note.textContent = error.message;
+          document.getElementById('field-grid')?.after(note);
+        }
       });
     }
 
@@ -2476,11 +2550,12 @@
     function renderDistribute() {
       buildDecks();
       panel(`
-        <div class="dx-phase-head"><span class="dx-tag">Sua m&atilde;o inicial</span><span class="dx-meta">5 respostas</span></div>
+        <section class="dx-deal-surface"><div class="dx-phase-head"><span class="dx-tag">Sua m&atilde;o inicial</span><span class="dx-meta">5 respostas</span></div>
         <p class="dx-kicker">Leia a Resposta, a Resolu&ccedil;&atilde;o e as palavras-chave.</p>
         <div class="dx-response-hand" style="margin-top:18px">${state.playerHand.map((card) => renderResponseCard(card)).join('')}</div>
-        <div class="dx-actions is-forward"><button class="dx-btn dx-btn-y" id="deal-go">Iniciar duelo</button></div>
+        <div class="dx-actions is-forward"><button class="dx-btn dx-btn-y" id="deal-go">Iniciar duelo</button></div></section>
       `, true);
+      document.getElementById('dx-panel')?.classList.add('is-deal', 'is-game-screen');
       document.querySelectorAll('.dx-response-card').forEach((card) => card.disabled = true);
       document.getElementById('deal-go')?.addEventListener('click', () => setPhase('duel'));
     }
@@ -2509,9 +2584,14 @@
               <div><span class="dx-condition" id="conditions-label">Sem condi&ccedil;&otilde;es ativas</span></div>
               <div class="dx-round-history" id="daily-round-history"></div>
             </aside>
-            <section class="dx-threat-zone" aria-live="polite">
-              <article class="dx-threat-card" id="daily-threat"></article>
-              <section class="dx-response-stage" id="daily-response-stage"></section>
+            <section class="dx-battle-zone" aria-live="polite">
+              <div class="dx-battle-heading"><span>Campo da rodada</span><p>Sentury revela a jogada; voc&ecirc; coloca uma resposta em campo.</p></div>
+              <div class="dx-battlefield">
+                <article class="dx-threat-card" id="daily-threat"></article>
+                <div class="dx-battle-vs" aria-hidden="true">VS</div>
+                <section class="dx-response-stage" id="daily-response-stage"></section>
+              </div>
+              <section class="dx-battle-history-wrap"><div class="dx-battle-history-title">Confrontos resolvidos</div><div class="dx-battle-history" id="daily-battle-history"></div></section>
             </section>
           </div>
           <div class="dx-hand-wrap">
@@ -2521,7 +2601,7 @@
           </div>
         </div>
       `, true);
-      document.getElementById('dx-panel')?.classList.add('is-duel');
+      document.getElementById('dx-panel')?.classList.add('is-duel', 'is-game-screen');
       startRound();
     }
 
@@ -2539,6 +2619,7 @@
       state.reorganizeUsed = !serverState.reorganize_available;
       state.knownCards = state.knownCards || {};
       state.playerHand.forEach((card) => { state.knownCards[card.id] = card; });
+      state.roundHistory.forEach((round) => { if (round.card) state.knownCards[round.card.id] = round.card; });
     }
 
     function previewResponse(card) {
@@ -2567,7 +2648,8 @@
       document.getElementById('daily-round-count').textContent = `Rodada ${state.round}/${state.maxRounds}`;
       document.getElementById('conditions-label').textContent = state.conditions.size ? `Condi\u00e7\u00f5es: ${[...state.conditions].join(' \u00b7 ')}` : 'Sem condi\u00e7\u00f5es ativas';
       document.getElementById('daily-threat').innerHTML = `
-        <span class="dx-threat-badge">!</span><div><span class="dx-threat-kicker">Amea&ccedil;a detectada</span><h2 class="dx-threat-name">${escapeHtml(threat.name)}</h2><p class="dx-threat-copy">${escapeHtml(threat.copy)}</p></div>
+        <div class="dx-sentury-actor${state.resolvingRound ? ' is-evaluating' : ''}"><span class="dx-sentury-face"><i class="dx-sentury-eye"></i><i class="dx-sentury-eye"></i></span><span class="dx-sentury-name">Sentury</span><span class="dx-sentury-status">${state.resolvingRound ? 'avaliando' : 'jogada revelada'}</span></div>
+        <div><span class="dx-threat-kicker">Carta do oponente</span><h2 class="dx-threat-name">${escapeHtml(threat.name)}</h2><p class="dx-threat-copy">${escapeHtml(threat.copy)}</p></div>
         <div class="dx-threat-meta"><span class="dx-threat-impact"><strong>${threat.impact}</strong> impacto</span><span class="dx-vulnerability">Vulner&aacute;vel a:<br>${threat.vulnerabilities.map(escapeHtml).join(' &middot; ')}</span></div>`;
       renderResponseStage();
       renderDailyHand();
@@ -2582,15 +2664,15 @@
       const selected = dailyCard(state.selectedCardId);
       if (!selected) {
         stage.className = 'dx-response-stage';
-        stage.innerHTML = `<p class="dx-response-placeholder">Sua resposta aparece aqui. Escolha uma carta da sua m&atilde;o para analisar as consequ&ecirc;ncias.</p>`;
+        stage.innerHTML = `<div class="dx-player-slot"><span class="dx-player-slot-label">Sua carta em campo</span><strong>Escolha uma resposta</strong><p>Compare as palavras-chave da carta do Sentury e coloque sua resposta aqui.</p></div>`;
         return;
       }
       const preview = previewResponse(selected);
       const matchText = preview.matched.length ? `<span class="is-match">Ativa ${preview.matched.map(escapeHtml).join(' &middot; ')}</span>` : 'N&atilde;o ativa vulnerabilidade desta amea&ccedil;a';
       const risk = selected.risk ? `<span class="dx-preview-risk">Risco: ${escapeHtml(selected.risk)}</span>` : '';
       stage.className = 'dx-response-stage is-selected';
-      stage.innerHTML = `<div class="dx-response-preview"><span class="dx-preview-emblem">${CARD_EMOJIS[selected.id] || '&#127183;'}</span><div><h3 class="dx-preview-title">${escapeHtml(selected.name)}</h3><p class="dx-preview-details">Conten&ccedil;&atilde;o estimada: <strong>${preview.estimate}</strong> &middot; ${matchText}<br>Impacto restante: ${preview.remaining} &middot; Press&atilde;o: -${selected.resolution}<br>${risk}${preview.ruleTriggered ? '<span class="dx-preview-risk">Regra do cen&aacute;rio ser&aacute; ativada.</span>' : ''}</p></div></div>
-        <div class="dx-response-actions"><button class="dx-btn dx-btn-y is-small" id="confirm-response" type="button">Confirmar resposta</button></div>`;
+      stage.innerHTML = `<div class="dx-response-preview"><span class="dx-preview-emblem">${responseGlyph(selected.type)}</span><div><span class="dx-player-slot-label">Sua carta em campo</span><h3 class="dx-preview-title">${escapeHtml(selected.name)}</h3><p class="dx-preview-details">Conten&ccedil;&atilde;o estimada: <strong>${preview.estimate}</strong> &middot; ${matchText}<br>Impacto restante: ${preview.remaining} &middot; Press&atilde;o: -${selected.resolution}<br>${risk}${preview.ruleTriggered ? '<span class="dx-preview-risk">Regra do cen&aacute;rio ser&aacute; ativada.</span>' : ''}</p></div></div>
+        <div class="dx-response-actions">${state.resolvingRound ? '<span class="dx-player-slot-label">Sentury avaliando...</span>' : '<button class="dx-btn dx-btn-y is-small" id="confirm-response" type="button">Confirmar confronto</button>'}</div>`;
       document.getElementById('confirm-response')?.addEventListener('click', confirmResponse);
     }
 
@@ -2619,6 +2701,9 @@
     function renderDailyHistory() {
       const history = document.getElementById('daily-round-history');
       history.innerHTML = state.roundHistory.map((round) => `<span class="dx-round-chip ${round.remaining_impact === 0 ? 'is-good' : 'is-risk'}">R${round.round} ${round.remaining_impact === 0 ? '&#10003;' : '!'}</span>`).join('') + `<span class="dx-round-chip is-current">R${state.round}</span>`;
+      const battleHistory = document.getElementById('daily-battle-history');
+      if (!battleHistory) return;
+      battleHistory.innerHTML = state.roundHistory.length ? state.roundHistory.map((round) => `<article class="dx-history-match ${round.remaining_impact === 0 ? 'is-contained' : 'is-impact'}"><span class="dx-history-round">R${round.round}</span><span class="dx-history-card dx-history-card--enemy">${escapeHtml(round.threat.name)}</span><span class="dx-history-vs">&times;</span><span class="dx-history-card">${escapeHtml(round.card.name)}</span><span class="dx-history-result">${round.remaining_impact === 0 ? 'contida' : `${round.remaining_impact} impacto`}</span></article>`).join('') : '<p class="dx-history-empty">Os confrontos resolvidos aparecer&atilde;o aqui.</p>';
     }
 
     function startRound() {
@@ -2653,6 +2738,9 @@
       const threat = activeThreat();
       if (!card || !threat || state.resolvingRound) return;
       state.resolvingRound = true;
+      state.resolutionMessage = 'Sentury está avaliando o confronto...';
+      state.resolutionMessageType = '';
+      renderDailyArena();
       try {
         const response = await dailyFetch('/api/daily-games/duelo-de-experiencia/play', {
           method: 'POST', body: JSON.stringify({ run_id: state.dailyRun.run_id, card_id: card.id })
@@ -2703,7 +2791,7 @@
 
     function resetState() {
       state.phase = 'intro'; state.field = null; state.playerHand = []; state.playerDeck = []; state.dailyRun = null;
-      state.serverGame = null; state.knownCards = {}; state.currentThreat = null; state.round = 0; state.trust = 100; state.pressure = 100; state.dailyResult = null; state.activeDailyRun = null;
+      state.serverGame = null; state.knownCards = {}; state.currentThreat = null; state.round = 0; state.trust = 100; state.pressure = 100; state.dailyResult = null; state.activeDailyRun = null; state.selectedScenarioId = null;
     }
 
     async function bootstrapDailyDuel() {
