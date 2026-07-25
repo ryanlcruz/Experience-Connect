@@ -24,7 +24,7 @@ body.activation-page {
 
 .activation-shell {
   width: 100%;
-  max-width: 1700px;
+  max-width: none;
   min-height: 100dvh;
   margin: 0 auto;
   display: grid;
@@ -156,8 +156,23 @@ body.activation-page {
   text-align: center;
 }
 
-.activation-page #loading-state {
-  padding: 0;
+.activation-page .activation-workspace #loading-state,
+.activation-page .activation-workspace #error-state {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  width: auto;
+  max-width: none;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 32px;
+  background: var(--activation-paper);
+}
+
+.activation-page .activation-workspace #loading-state.hidden,
+.activation-page .activation-workspace #error-state.hidden {
+  display: none;
 }
 
 .activation-status-card {
@@ -350,6 +365,12 @@ body.activation-page {
 
 .activation-page .step-content {
   animation: activation-step-in 200ms cubic-bezier(.4, 0, .2, 1);
+}
+
+.activation-page #step-character {
+  max-width: 500px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 @keyframes activation-step-in {
@@ -553,7 +574,7 @@ body.activation-page {
 
 .activation-page .avatar-selector-container {
   max-height: none;
-  margin: 0 0 20px;
+  margin: 0 0 14px;
   overflow: visible;
 }
 
@@ -561,7 +582,7 @@ body.activation-page {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   width: 100%;
-  gap: 12px;
+  gap: 10px;
   padding: 0;
 }
 
@@ -656,7 +677,7 @@ body.activation-page {
   gap: 12px;
   width: 100%;
   max-width: 224px;
-  margin: 16px auto 0;
+  margin: 10px auto 0;
 }
 
 .avatar-page-control {
@@ -904,6 +925,22 @@ body.activation-page {
   .activation-page .passkey-guide {
     max-width: 410px;
     margin-bottom: 14px;
+  }
+
+  .activation-page #step-character .avatar-grid {
+    gap: 8px;
+  }
+
+  .activation-page #step-character .avatar-card {
+    aspect-ratio: 1.08 / 1;
+  }
+
+  .activation-page #step-character .avatar-selector-container {
+    margin-bottom: 10px;
+  }
+
+  .activation-page #step-character .avatar-pagination {
+    margin-top: 8px;
   }
 }
 
