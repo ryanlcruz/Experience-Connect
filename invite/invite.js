@@ -6,6 +6,13 @@
   var state = { accountExists: false, avatar: null, nickname: null };
   var activationMorphGeneration = 0;
 
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Tab') document.body.classList.add('keyboard-navigation');
+  }, true);
+  document.addEventListener('pointerdown', function () {
+    document.body.classList.remove('keyboard-navigation');
+  }, true);
+
   var ACTIVATION_AML_SYMBOLS = {
     ec: '<text x="14" y="19" font-family="DM Sans" font-weight="800" font-size="13" fill="currentColor" stroke="none" text-anchor="middle">EC</text>',
     sentury: '<rect x="6" y="9" width="16" height="12" rx="3" class="activation-aml-draw" style="--len:60"/><line x1="14" y1="5" x2="14" y2="9" class="activation-aml-draw" style="--len:6"/><circle cx="10.5" cy="15" r="1.3" fill="currentColor" stroke="none"/><circle cx="17.5" cy="15" r="1.3" fill="currentColor" stroke="none"/>',

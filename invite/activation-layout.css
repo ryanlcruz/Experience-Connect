@@ -440,7 +440,13 @@ body.activation-page {
   box-shadow: none;
 }
 
-.activation-page .input-group input:focus-visible {
+.activation-page .input-group input:focus {
+  outline: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.activation-page.keyboard-navigation .input-group input:focus {
   outline: none;
   box-shadow: 3px 3px 0 var(--activation-ink), 0 0 0 2px #fff, 0 0 0 5px var(--activation-info);
   transform: translate(-1px, -1px);
