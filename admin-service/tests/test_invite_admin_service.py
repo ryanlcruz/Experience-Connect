@@ -13,8 +13,8 @@ def service():
 @pytest.mark.asyncio
 async def test_bulk_invites_uses_single_batch_rpc_and_keeps_failures(service):
     rows = [
-        {"nickname": "ana", "grant": {"invite_code": "EC-1"}, "error": None},
-        {"nickname": "bia", "grant": None, "error": "invite_already_issued"},
+        {"nickname": "ana", "grant_payload": {"invite_code": "EC-1"}, "error": None},
+        {"nickname": "bia", "grant_payload": None, "error": "invite_already_issued"},
     ]
     with patch("app.services.invite_admin_service.supabase_client") as client:
         client.call_rpc = AsyncMock(return_value=rows)
@@ -39,7 +39,7 @@ async def test_single_invite_never_replaces_an_active_invite_silently(service):
         result = await service.create_invite("ana", "nexus-panel")
 
     assert result == {"ok": True, "invite": {"invite_code": "EC-NEW"}}
-    assert client.call_rpc.await_args.args[0] == "create_passkey_grant"
+    assert client.call_rpc.await_args.args[0] == "create_passkey_grant_controlled"
     assert client.call_rpc.await_args.args[1]["p_replace_active"] is False
 
 

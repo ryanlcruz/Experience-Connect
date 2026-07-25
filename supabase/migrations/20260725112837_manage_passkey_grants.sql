@@ -12,7 +12,7 @@ alter table public.passkey_security_events
     'SESSIONS_REVOKED'
   ));
 
-create function public.create_passkey_grant(
+create function public.create_passkey_grant_controlled(
   p_grant_type text,
   p_nickname text,
   p_target_user_id uuid,
@@ -202,7 +202,7 @@ create or replace function public.create_passkey_invite_batch(
 returns table (
   row_number integer,
   nickname text,
-  grant jsonb,
+  grant_payload jsonb,
   error text
 )
 language plpgsql
@@ -225,7 +225,7 @@ begin
     v_nickname := trim(coalesce(p_nicknames[v_index], ''));
     row_number := v_index;
     nickname := v_nickname;
-    grant := null;
+    grant_payload := null;
     error := null;
 
     if v_nickname = '' then
@@ -246,7 +246,7 @@ begin
       error := 'nickname_already_exists';
     else
       begin
-        grant := public.create_passkey_grant(
+        grant_payload := public.create_passkey_grant_controlled(
           'INVITE',
           v_nickname,
           null::uuid,
@@ -270,9 +270,9 @@ $$;
 revoke all on function public.revoke_passkey_grant(uuid, text) from public, anon, authenticated;
 revoke all on function public.revoke_issued_passkey_invites(text) from public, anon, authenticated;
 revoke all on function public.create_passkey_invite_batch(text[], text) from public, anon, authenticated;
-revoke all on function public.create_passkey_grant(text, text, uuid, timestamptz, text, boolean) from public, anon, authenticated;
+revoke all on function public.create_passkey_grant_controlled(text, text, uuid, timestamptz, text, boolean) from public, anon, authenticated;
 
 grant execute on function public.revoke_passkey_grant(uuid, text) to service_role;
 grant execute on function public.revoke_issued_passkey_invites(text) to service_role;
 grant execute on function public.create_passkey_invite_batch(text[], text) to service_role;
-grant execute on function public.create_passkey_grant(text, text, uuid, timestamptz, text, boolean) to service_role;
+grant execute on function public.create_passkey_grant_controlled(text, text, uuid, timestamptz, text, boolean) to service_role;

@@ -29,7 +29,7 @@ class InviteAdminService:
                      replace_active: bool = True) -> Dict[str, Any]:
         expires = datetime.now(timezone.utc) + (self.RECOVERY_TTL if grant_type == "RECOVERY" else self.EVENT_TTL)
         try:
-            data = await supabase_client.call_rpc("create_passkey_grant", {
+            data = await supabase_client.call_rpc("create_passkey_grant_controlled", {
                 "p_grant_type": grant_type,
                 "p_nickname": nickname,
                 "p_target_user_id": target_user_id,
@@ -62,7 +62,7 @@ class InviteAdminService:
         results = [{
             "ok": not bool(row.get("error")),
             "nickname": row.get("nickname", ""),
-            "invite": row.get("grant") or None,
+            "invite": row.get("grant_payload") or None,
             "error": row.get("error") or None,
         } for row in (rows or [])]
         return {
