@@ -1,6 +1,5 @@
--- Operational controls for passkey invitation grants.
--- Raw tokens and codes remain one-time outputs only; this migration never
--- stores them outside the existing hashes in passkey_grants.
+
+drop function if exists public.create_passkey_grant(text, text, uuid, timestamptz, text, boolean);
 
 alter table public.passkey_security_events
   drop constraint if exists passkey_security_events_event_type_check;
@@ -12,7 +11,7 @@ alter table public.passkey_security_events
     'SESSIONS_REVOKED'
   ));
 
-create function public.create_passkey_grant_controlled(
+create or replace function public.create_passkey_grant_controlled(
   p_grant_type text,
   p_nickname text,
   p_target_user_id uuid,
