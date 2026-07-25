@@ -120,12 +120,20 @@
         <div class="wrapx rd-wrap">
 
             <section class="rd-hero">
+                <div class="rd-hero__copy">
                 <span class="rd-hero__tag">Recompensas</span>
                 <h1 class="rd-hero__title">Resgatar <span class="text-yellow">Códigos</span></h1>
                 <p class="rd-hero__sub">Insira códigos liberados nas lives do Experience Week e ganhe XP, brindes e conquistas secretas.</p>
+                </div>
+                <div class="rd-hero__ticket" aria-label="Resumo dos seus resgates">
+                    <span class="rd-hero__ticket-label">Minha coleção</span>
+                    <strong class="rd-hero__ticket-value" id="redeem-history-total">--</strong>
+                    <span class="rd-hero__ticket-copy">resgates registrados</span>
+                </div>
             </section>
 
-            <section class="rd-card">
+            <div class="rd-workspace">
+            <section class="rd-card" aria-label="Resgatar código">
                 <span class="rd-card__fold" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                 </span>
@@ -162,6 +170,32 @@
                 </div>
             </section>
 
+            <section class="rd-collection" aria-labelledby="redeem-history-title">
+                <div class="rd-collection__head">
+                    <div class="rd-collection__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M12 11v6M9 14h6"/></svg>
+                    </div>
+                    <div>
+                        <span class="rd-collection__eyebrow">Seu inventário</span>
+                        <h2 class="rd-collection__title" id="redeem-history-title">Meus resgates</h2>
+                    </div>
+                </div>
+                <p class="rd-collection__sub">Acompanhe os brindes reservados e todo XP que já entrou na sua jornada.</p>
+                <div class="rd-collection__loading" id="rd-history-loading" role="status">
+                    <span class="rd-collection__loading-mark" aria-hidden="true">EC</span>
+                    Carregando seus resgates...
+                </div>
+                <ol class="rd-collection__list" id="rd-history-list" hidden aria-live="polite"></ol>
+                <div class="rd-collection__empty" id="rd-history-empty" hidden>
+                    <div class="rd-collection__empty-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7"/><path d="M2 7h20v5H2z"/><path d="M12 7v14"/><path d="M12 7H7.5a2.5 2.5 0 1 1 2.5-3.5C10 5.5 12 7 12 7Z"/><path d="M12 7h4.5A2.5 2.5 0 1 0 14 3.5C14 5.5 12 7 12 7Z"/></svg>
+                    </div>
+                    <strong>Sua coleção começa aqui</strong>
+                    <p>Quando você resgatar um código, a recompensa aparecerá neste espaço.</p>
+                </div>
+            </section>
+            </div>
+
             <section class="rd-info">
                 <article class="rd-info__card">
                     <div class="rd-info__ic">
@@ -186,7 +220,7 @@
                 </article>
             </section>
 
-            <section class="rd-history">
+            <section class="rd-history" hidden aria-hidden="true">
                 <h2 class="rd-history__title">Últimos Códigos <span class="text-yellow">Usados</span></h2>
                 <div id="rd-history-table-wrap">
                     <table class="rd-history__table" id="rd-history-table" hidden>
@@ -200,7 +234,7 @@
                         </thead>
                         <tbody id="rd-history-body"></tbody>
                     </table>
-                    <div class="rd-history__empty" id="rd-history-empty">
+                    <div class="rd-history__empty" id="rd-history-empty-legacy">
                         <div class="rd-history__empty-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2" ry="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
                         </div>

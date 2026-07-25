@@ -135,6 +135,109 @@ const RESGATE_FLOW = ['ec', 'xp', 'reward', 'check'];
 
 let _amlGen = 0;
 
+function getRedeemApi() {
+    return ((window.__APP_CONFIG__ && window.__APP_CONFIG__.CXGAME_VPS_API_BASE) || 'https://api.expconnect.com.br').replace(/\/+$/, '');
+}
+
+function rewardIcon(type) {
+    if (type === 'xp') {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M12 11v6M9 14h6"/></svg>';
+}
+
+function formatRedeemDate(value) {
+    if (!value) return 'Resgate registrado';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Resgate registrado';
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function redeemStatus(status) {
+    const statuses = {
+        concluido: ['Concluído', 'done'],
+        pendente: ['Reservado', 'pending'],
+        entregue: ['Entregue', 'delivered'],
+        cancelado: ['Cancelado', 'cancelled']
+    };
+    return statuses[status] || ['Registrado', 'done'];
+}
+
+function renderRedeemHistory(payload) {
+    const loading = document.getElementById('rd-history-loading');
+    const list = document.getElementById('rd-history-list');
+    const empty = document.getElementById('rd-history-empty');
+    const total = document.getElementById('redeem-history-total');
+    if (!loading || !list || !empty) return;
+
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    const count = Number.isFinite(Number(payload?.total)) ? Number(payload.total) : items.length;
+    loading.hidden = true;
+    list.replaceChildren();
+    if (total) total.textContent = String(count);
+
+    if (!items.length) {
+        list.hidden = true;
+        empty.hidden = false;
+        return;
+    }
+
+    empty.hidden = true;
+    list.hidden = false;
+    items.forEach((item) => {
+        const type = item.reward_type === 'xp' ? 'xp' : 'brinde';
+        const reward = item.reward && typeof item.reward === 'object' ? item.reward : {};
+        const xp = Number(reward.xp);
+        const title = type === 'xp'
+            ? `+${Number.isFinite(xp) && xp > 0 ? xp : 0} XP`
+            : (String(reward.nome || 'Brinde reservado').trim() || 'Brinde reservado');
+        const [statusLabel, statusClass] = redeemStatus(item.status);
+
+        const row = document.createElement('li');
+        row.className = 'rd-redeem-item';
+        const icon = document.createElement('span');
+        icon.className = 'rd-redeem-item__icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerHTML = rewardIcon(type);
+
+        const copy = document.createElement('div');
+        const name = document.createElement('p');
+        name.className = 'rd-redeem-item__name';
+        name.textContent = title;
+        const meta = document.createElement('p');
+        meta.className = 'rd-redeem-item__meta';
+        meta.textContent = `${type === 'xp' ? 'XP aplicado' : 'Brinde'} · ${formatRedeemDate(item.redeemed_at)}`;
+        copy.append(name, meta);
+
+        const status = document.createElement('span');
+        status.className = `rd-redeem-item__status rd-redeem-item__status--${statusClass}`;
+        status.textContent = statusLabel;
+        row.append(icon, copy, status);
+        list.appendChild(row);
+    });
+}
+
+async function loadRedeemHistory() {
+    const loading = document.getElementById('rd-history-loading');
+    const list = document.getElementById('rd-history-list');
+    const empty = document.getElementById('rd-history-empty');
+    if (!loading || !list || !empty) return;
+
+    loading.hidden = false;
+    list.hidden = true;
+    empty.hidden = true;
+    try {
+        const response = await fetch(`${getRedeemApi()}/api/redeem/history`, { credentials: 'include' });
+        if (!response.ok) throw new Error('history_unavailable');
+        renderRedeemHistory(await response.json());
+    } catch (_) {
+        loading.hidden = true;
+        empty.hidden = false;
+        empty.querySelector('strong').textContent = 'Não foi possível carregar seus resgates';
+        empty.querySelector('p').textContent = 'Tente atualizar a página em instantes.';
+    }
+}
+
 function amlDrawOne(stage, sym, onDone) {
     const gen = _amlGen;
     stage.innerHTML =
@@ -199,7 +302,7 @@ function setupRedeemForm() {
         resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    const REDEEM_API = ((window.__APP_CONFIG__ && window.__APP_CONFIG__.CXGAME_VPS_API_BASE) || 'https://api.expconnect.com.br').replace(/\/+$/, '');
+    const REDEEM_API = getRedeemApi();
 
     async function postRedeem(code) {
         const idempotencyKey = (window.crypto && crypto.randomUUID)
@@ -281,7 +384,10 @@ function setupRedeemForm() {
         submitBtn.removeAttribute('aria-busy');
         stage.innerHTML = '';
         renderOutcome(outcome);
-        if (outcome.data && outcome.data.ok) codeInput.value = '';
+        if (outcome.data && outcome.data.ok) {
+            codeInput.value = '';
+            await loadRedeemHistory();
+        }
     });
 
     codeInput.addEventListener('input', () => {
@@ -338,9 +444,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await initSyncIndicators();
     setupRedeemForm();
-    // Historico real (via endpoint da VPS) fica pra depois; oculta a secao na v1.
-    document.querySelector('.rd-history')?.setAttribute('hidden', '');
+    await loadRedeemHistory();
 });
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') document.body.classList.add('keyboard-navigation');
+}, true);
+document.addEventListener('pointerdown', () => {
+    document.body.classList.remove('keyboard-navigation');
+}, true);
 
 window.toggleMobileMenu = toggleMobileMenu;
 window.handleLogout = handleLogout;

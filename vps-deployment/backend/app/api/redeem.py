@@ -73,6 +73,45 @@ def _map_result(result) -> dict:
     return {"ok": False, "error": error, "message": _MESSAGES.get(error, _GENERIC)}
 
 
+@router.get("/history")
+async def redeem_history(
+    session_user: dict = Depends(require_session_user),
+) -> dict:
+    """Return only the authenticated player's recent rewards.
+
+    Codes and idempotency values are intentionally absent: after redemption the
+    player needs the reward record, not a reusable secret.
+    """
+    try:
+        result = (
+            supabase_client.table("redeem_orders")
+            .select("id,reward_type,reward_snapshot,status,created_at", count="exact")
+            .eq("user_id", session_user["sub"])
+            .order("created_at", desc=True)
+            .limit(12)
+            .execute()
+        )
+    except Exception as exc:
+        logger.error("redeem history failed user_id=%s: %s", session_user["sub"], exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Historico de resgates temporariamente indisponivel",
+        )
+
+    items = []
+    for row in result.data or []:
+        reward = row.get("reward_snapshot")
+        items.append({
+            "id": row.get("id"),
+            "reward_type": row.get("reward_type"),
+            "reward": reward if isinstance(reward, dict) else {},
+            "status": row.get("status"),
+            "redeemed_at": row.get("created_at"),
+        })
+
+    return {"items": items, "total": int(result.count or len(items))}
+
+
 @router.post("")
 async def redeem_code(
     payload: RedeemRequest,
