@@ -350,6 +350,7 @@
       border-color: var(--y);
       box-shadow: var(--s3);
     }
+    .dx-field-card.is-locked { cursor:default; opacity:.46; filter:grayscale(1); pointer-events:none; }
 
     .dx-field-card-back, .dx-field-card-front {
       position: absolute; inset: 0; backface-visibility: hidden;
@@ -399,6 +400,12 @@
     }
     .dx-field-confirmation strong { display: block; font-family: var(--fb); font-size: 26px; line-height: .9; text-transform: uppercase; }
     .dx-field-confirmation span { display: block; margin-top: 4px; font-family: var(--fm); font-size: 9px; font-weight: 700; color: var(--n5); text-transform: uppercase; }
+    .dx-field-screen { display:grid; grid-template-columns:280px minmax(0,1fr); gap:44px; max-width:1120px; margin:clamp(70px,12vh,150px) auto 0; align-items:center; }
+    .dx-field-screen h1 { margin:14px 0 12px; font-family:var(--fb); font-size:clamp(42px,5vw,62px); line-height:.9; text-transform:uppercase; }
+    .dx-field-screen p { color:var(--n5); font-size:15px; line-height:1.5; }
+    .dx-field-screen .dx-field-grid { justify-content:flex-start; gap:22px; margin:0; }
+    .dx-field-screen .dx-field-card { width:184px; height:258px; }
+    .dx-field-screen .dx-field-confirmation { max-width:none; margin:26px 0 0; }
 
     /* Slam Reveal Effects */
     .dx-panel.is-hit {
@@ -947,6 +954,9 @@
       background: var(--k2); color: var(--w); border: var(--b2); border-radius: var(--r2);
       box-shadow: var(--s2);
     }
+    .dx-hud-persona { display:flex; align-items:center; gap:9px; }
+    .dx-hud-persona .dx-sentury-face { width:32px; height:32px; gap:6px; flex:0 0 auto; }
+    .dx-hud-persona .dx-sentury-eye { width:4px; height:12px; }
     .dx-hud-meter { display: grid; gap: 5px; }
     .dx-hud-meter:last-child { text-align: right; }
     .dx-hud-label, .dx-round-count, .dx-condition {
@@ -991,8 +1001,8 @@
     .dx-battlefield { display:grid; grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr); align-items:stretch; gap:10px; }
     .dx-battle-vs { display:grid; place-items:center; font-family:var(--fb); font-size:24px; color:var(--n4); }
     .dx-threat-card {
-      display: grid; grid-template-columns: 116px minmax(0, 1fr) auto; align-items: center; gap: 18px;
-      min-height: 208px; padding: 16px; background: var(--k2); color: var(--w);
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px;
+      min-height: 208px; padding: 20px; background: var(--k2); color: var(--w);
       border: var(--b2); border-radius: var(--r3); box-shadow: var(--s2); animation: dxThreatEnter .35s var(--spring) both;
     }
     .dx-sentury-actor { display: grid; justify-items: center; gap: 7px; padding-right: 16px; border-right: 1px solid var(--k4); text-align: center; }
@@ -1027,6 +1037,12 @@
     .dx-preview-details .is-match { color: var(--ok); font-weight: 700; }
     .dx-preview-risk { color: var(--wn); }
     .dx-response-actions { display: flex; align-items: center; gap: 8px; }
+    .dx-round-feedback { display:grid; grid-template-columns:auto minmax(0,1fr); gap:12px; align-items:center; min-height:58px; padding:10px 13px; border:var(--b2); border-radius:var(--r2); background:var(--w); box-shadow:var(--s1); }
+    .dx-round-feedback-step { display:grid; place-items:center; min-width:32px; min-height:32px; padding:3px 6px; background:var(--y); border:var(--b1); border-radius:var(--r1); font-family:var(--fm); font-size:8px; font-weight:700; text-transform:uppercase; }
+    .dx-round-feedback strong { display:block; font-family:var(--fd); font-size:12px; font-weight:800; color:var(--k); }
+    .dx-round-feedback p { margin-top:2px; font-size:11px; line-height:1.35; color:var(--n5); }
+    .dx-round-feedback.is-success { border-color:var(--ok); background:var(--ok2); }
+    .dx-round-feedback.is-risk { border-color:var(--er); background:var(--er2); }
     .dx-battle-history-wrap { display:grid; gap:6px; padding-top:2px; }
     .dx-battle-history { display:flex; flex-wrap:wrap; gap:6px; }
     .dx-history-match { display:grid; grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr) auto; align-items:center; gap:5px; max-width:100%; padding:5px 7px; border:var(--b1); border-radius:var(--r1); background:var(--w); font-family:var(--fm); font-size:8px; }
@@ -1116,11 +1132,14 @@
 
     /* === RESPONSIVE === */
     @media (max-width: 700px) {
+      .dx-field-screen { grid-template-columns:1fr; gap:24px; margin:32px auto 0; }
+      .dx-field-screen .dx-field-grid { justify-content:center; }
+      .dx-field-screen .dx-field-card { width:116px; height:176px; }
       .dx-battlefield { grid-template-columns:1fr; gap:8px; }
       .dx-battle-vs { min-height:28px; }
       .dx-threat-card, .dx-response-stage { min-height:170px; }
-      .dx-threat-card { grid-template-columns:86px minmax(0,1fr); gap:12px; }
-      .dx-threat-meta { grid-column:2; justify-items:start; text-align:left; grid-auto-flow:column; align-items:center; }
+      .dx-threat-card { grid-template-columns:minmax(0,1fr); gap:10px; }
+      .dx-threat-meta { justify-items:start; text-align:left; grid-auto-flow:column; align-items:center; }
       .dx-sentury-actor { padding-right:10px; }
       .dx-sentury-face { width:44px; height:44px; gap:8px; }
       .dx-sentury-eye { width:6px; height:16px; }
@@ -1210,6 +1229,68 @@
         animation-duration: 1ms !important; transition-duration: 1ms !important;
       }
     }
+
+    /* === DAILY DUEL: CAMPO, CARTAS E CONSEQUENCIA === */
+    .dx-arena-v2 { min-height:calc(100dvh - 118px); grid-template-rows:74px 74px minmax(300px,1fr) 226px; gap:12px; }
+    .dx-duel-hud { grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); min-height:74px; padding:10px 14px; background:var(--w); color:var(--k); border:var(--b2); border-radius:var(--r3); box-shadow:var(--s2); }
+    .dx-hud-meter { gap:4px; }
+    .dx-hud-meter--trust { justify-items:end; }
+    .dx-hud-persona { gap:10px; }
+    .dx-hud-persona .dx-sentury-face { width:50px; height:50px; gap:8px; border-color:var(--y); background:var(--k2); }
+    .dx-hud-persona .dx-sentury-eye { width:6px; height:18px; background:var(--w); }
+    .dx-hud-persona.is-evaluating .dx-sentury-eye { animation:dxSenturyEvaluate .34s ease-in-out infinite alternate; }
+    .dx-hud-label { color:var(--n5); }
+    .dx-hud-number { margin-top:2px; color:var(--k); font-size:30px; }
+    .dx-hud-meter--pressure .dx-hud-number { color:var(--er); }
+    .dx-hud-meter--trust .dx-hud-number { color:var(--ok); }
+    .dx-hud-bar { width:min(100%,320px); height:7px; border-color:var(--n3); background:var(--ow2); }
+    .dx-hud-meter--trust .dx-hud-bar { justify-self:end; }
+    .dx-round-count { position:relative; min-width:150px; padding:0 24px; color:var(--k); font-family:var(--fb); font-size:23px; letter-spacing:.08em; }
+    .dx-round-count::before,.dx-round-count::after { content:''; position:absolute; top:50%; width:26px; border-top:1px solid var(--n3); }
+    .dx-round-count::before { left:-10px; }.dx-round-count::after { right:-10px; }
+
+    .dx-scenario-strip { display:grid; grid-template-columns:290px minmax(230px,.8fr) minmax(360px,1.2fr); align-items:center; gap:22px; padding:10px 14px; background:var(--ow); border:var(--b1); border-radius:var(--r2); box-shadow:var(--s1); }
+    .dx-scenario-strip .dx-scenario-face { min-width:0; }
+    .dx-scenario-strip .dx-scenario-icon { width:40px; height:40px; }
+    .dx-scenario-strip .dx-scenario-name { font-size:25px; }
+    .dx-scenario-strip .dx-rule-box { min-width:0; padding:0 18px; border-top:0; border-left:1px solid var(--n3); }
+    .dx-scenario-strip .dx-rule-box strong { margin-bottom:2px; }
+    .dx-scenario-strip .dx-rule-box p { font-size:10px; white-space:normal; }
+    .dx-strip-condition { color:var(--er); font-family:var(--fm); font-size:8px; font-weight:700; text-transform:uppercase; }
+    .dx-round-timeline { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .dx-round-chip { position:relative; display:grid; justify-items:center; gap:4px; min-width:32px; padding:0; border:0; border-radius:0; background:transparent; color:var(--n4); font-family:var(--fm); font-size:8px; }
+    .dx-round-chip::after { content:''; position:absolute; z-index:0; top:16px; left:calc(50% + 18px); width:calc(100% + 10px); border-top:1px dashed var(--n3); }
+    .dx-round-chip:last-child::after { display:none; }
+    .dx-round-chip b { position:relative; z-index:1; display:grid; place-items:center; width:34px; height:34px; border:var(--b1); border-radius:50%; background:var(--ow); color:var(--k); }
+    .dx-round-chip i { min-height:11px; font-style:normal; text-transform:uppercase; }
+    .dx-round-chip.is-good b { border-color:var(--ok); color:var(--ok); }.dx-round-chip.is-risk b { border-color:var(--er); color:var(--er); }
+    .dx-round-chip.is-current b { border:var(--b2); background:var(--y); color:var(--k); }
+
+    .dx-battle-zone { display:grid; grid-template-rows:auto minmax(0,1fr); gap:8px; min-height:0; }
+    .dx-battle-heading { width:min(100%,900px); margin:0 auto; }
+    .dx-battlefield { grid-template-columns:minmax(185px,240px) minmax(220px,270px) minmax(185px,240px); justify-content:center; align-items:stretch; gap:28px; min-height:0; }
+    .dx-threat-card,.dx-response-stage { min-height:0; height:100%; border-radius:var(--r3); box-shadow:var(--s2); }
+    .dx-threat-card { display:grid; grid-template-rows:auto 102px minmax(0,1fr); gap:0; padding:0; overflow:hidden; background:var(--k2); color:var(--w); border:var(--b2); }
+    .dx-threat-card__head { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 11px 8px; background:var(--k); border-bottom:1px solid var(--k4); }
+    .dx-threat-kicker { color:var(--er); font-size:8px; }.dx-threat-impact { display:flex; align-items:baseline; gap:3px; color:var(--n2); font-size:8px; }
+    .dx-threat-impact strong { color:var(--er); font-size:30px; }
+    .dx-threat-card__visual { position:relative; display:grid; place-items:center; overflow:hidden; background-color:var(--k3); background-position:center; background-size:cover; border-bottom:1px solid var(--k4); }
+    .dx-threat-card__visual span { display:grid; place-items:center; width:38px; height:38px; border:var(--b2); border-radius:var(--r2); background:var(--er); color:var(--w); font-family:var(--fb); font-size:29px; line-height:1; box-shadow:var(--s1); }
+    .dx-threat-card__body { display:grid; align-content:start; gap:8px; padding:11px; }.dx-threat-name { margin:0; font-size:clamp(25px,2.4vw,34px); }.dx-threat-copy { margin:0; font-size:10px; color:var(--n2); }
+    .dx-vulnerability { display:grid; gap:5px; padding-top:8px; border-top:1px solid var(--k4); color:var(--n2); font-size:8px; }.dx-vulnerability > span { font-family:var(--fm); font-weight:700; letter-spacing:.09em; text-transform:uppercase; }.dx-vulnerability > div { display:flex; flex-wrap:wrap; gap:4px; }.dx-vulnerability b { padding:3px 5px; border:1px solid var(--er); border-radius:var(--r1); color:var(--er); font-family:var(--fm); font-size:7px; letter-spacing:.05em; text-transform:uppercase; }
+
+    .dx-response-stage { display:grid; padding:0; overflow:hidden; border:var(--b2); background:var(--w); }.dx-response-stage:not(.is-selected) { border-style:dashed; border-color:var(--n3); background:var(--ow2); box-shadow:none; }.dx-player-slot { align-content:center; padding:20px; }.dx-player-slot strong { font-size:29px; }.dx-stage-response-card { display:grid; min-height:0; overflow:hidden; background:var(--w); }.dx-stage-response-card .dx-response-card__visual { min-height:102px; }.dx-stage-response-card .dx-response-card__body { padding:12px; }.dx-stage-response-card .dx-response-card__name { font-size:31px; }.dx-stage-response-card .dx-response-card__effect { font-size:10px; }
+
+    .dx-round-feedback { display:grid; grid-template-columns:1fr; align-content:center; gap:9px; min-height:0; padding:16px; border:var(--b2); border-radius:var(--r3); background:var(--w); box-shadow:var(--s1); text-align:center; }.dx-round-feedback-step { justify-self:center; min-width:auto; min-height:auto; padding:0; border:0; border-radius:0; background:transparent; color:var(--n4); font-family:var(--fb); font-size:27px; }.dx-feedback-kicker { display:block; margin-bottom:5px; color:var(--n4); font-family:var(--fm); font-size:8px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }.dx-round-feedback strong { font-size:27px; line-height:.92; }.dx-round-feedback p { font-size:11px; }.dx-round-feedback.is-selected { border-color:var(--y); background:var(--w); box-shadow:var(--s2); }.dx-round-feedback.is-success { border-color:var(--ok); background:var(--ok2); }.dx-round-feedback.is-risk { border-color:var(--er); background:var(--er2); }.dx-round-feedback.is-evaluating .dx-round-feedback-step { color:var(--y2); animation:dxFeedbackWait .45s ease-in-out infinite alternate; }
+    .dx-feedback-matches { display:grid; gap:5px; margin:8px 0; text-align:left; list-style:none; }.dx-feedback-matches li { padding:5px 7px; border:var(--b1); border-radius:var(--r1); background:var(--ow); font-family:var(--fm); font-size:8px; font-weight:700; text-transform:uppercase; }.dx-feedback-matches .is-match { border-color:var(--ok); color:var(--ok); }.dx-feedback-matches .is-risk { border-color:var(--er); color:var(--er); }.dx-feedback-metrics { display:grid; gap:5px; margin:10px 0; padding:9px 0; border-top:1px dashed var(--n3); border-bottom:1px solid var(--n3); text-align:left; font-family:var(--fm); font-size:8px; text-transform:uppercase; }.dx-feedback-metrics b { float:right; color:var(--k); font-family:var(--fb); font-size:22px; line-height:.7; }.dx-round-feedback .dx-btn { width:100%; margin-top:2px; }
+
+    .dx-hand-wrap { display:grid; grid-template-rows:auto minmax(0,1fr); gap:7px; min-height:0; }.dx-response-hand { display:flex; justify-content:center; align-items:flex-end; gap:12px; min-height:0; }.dx-response-card { flex:0 1 188px; width:188px; height:216px; min-height:0; display:grid; grid-template-rows:34px 58px minmax(0,1fr); }.dx-response-card__head { min-height:34px; padding:6px 8px; }.dx-response-card__glyph { width:22px; height:22px; }.dx-response-card__visual { display:grid; place-items:center; background:var(--k2); color:var(--y); border-bottom:var(--b1); }.dx-response-card__visual svg { width:35px; height:35px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }.dx-response-card__body { gap:5px; padding:8px 9px 9px; }.dx-response-card__name { font-size:23px; }.dx-response-card__effect { min-height:25px; font-size:9px; }.dx-response-card__keywords { display:flex; flex-wrap:wrap; gap:3px; color:inherit; font-size:0; }.dx-response-card__keywords b { padding:2px 4px; border:1px solid var(--ok); border-radius:var(--r1); color:var(--ok); font-family:var(--fm); font-size:7px; line-height:1.1; letter-spacing:.04em; text-transform:uppercase; }.dx-response-card__numbers { gap:5px; }.dx-response-card__numbers span { padding:3px; }.dx-response-card__numbers b { font-size:15px; }.dx-response-card:not(:disabled):hover { z-index:2; transform:translateY(-12px) scale(1.03); }.dx-response-card.is-selected { border-color:var(--y); background:var(--y4); }.dx-response-card:disabled { cursor:default; opacity:.62; }
+
+    @keyframes dxSenturyEye { 0%,42%,100% { transform:scaleY(1); } 48% { transform:scaleY(.68) translateY(2px); } 54% { transform:scaleY(1.12) translateY(-1px); } }
+    @keyframes dxFeedbackWait { from { transform:translateY(0); } to { transform:translateY(-3px); } }
+
+    @media (max-width:960px) { .dx-arena-v2 { grid-template-rows:auto auto minmax(280px,1fr) 218px; }.dx-scenario-strip { grid-template-columns:minmax(0,1fr) minmax(270px,1fr); }.dx-round-timeline { grid-column:1 / -1; max-width:450px; justify-self:end; width:100%; }.dx-battlefield { grid-template-columns:minmax(170px,220px) minmax(190px,240px) minmax(170px,220px); gap:16px; }.dx-response-card { width:156px; height:205px; } }
+    @media (max-width:700px) { .dx-arena-v2 { min-height:auto; grid-template-rows:auto auto auto auto; }.dx-duel-hud { grid-template-columns:1fr 1fr; }.dx-round-count { grid-column:1 / -1; grid-row:1; }.dx-scenario-strip { grid-template-columns:1fr; gap:10px; }.dx-scenario-strip .dx-rule-box { padding:10px 0 0; border-left:0; border-top:1px solid var(--n3); }.dx-round-timeline { grid-column:auto; justify-self:stretch; }.dx-battlefield { grid-template-columns:1fr; width:min(100%,320px); margin:0 auto; }.dx-round-feedback { order:3; min-height:150px; }.dx-response-stage { min-height:300px; }.dx-threat-card { min-height:300px; }.dx-response-hand { justify-content:flex-start; overflow-x:auto; padding:8px 3px 14px; }.dx-response-card { flex:0 0 154px; width:154px; } }
   </style>
 </head>
 <body>
@@ -2429,16 +2510,21 @@
     }
 
     function renderResponseCard(card, selected = false) {
+      return `<button class="dx-response-card${selected ? ' is-selected' : ''}" type="button" data-card-id="${escapeHtml(card.id)}">${renderResponseCardFace(card)}</button>`;
+    }
+
+    function renderResponseCardFace(card) {
       const label = TYPE_LABELS[card.type] || card.type;
-      return `<button class="dx-response-card${selected ? ' is-selected' : ''}" type="button" data-card-id="${escapeHtml(card.id)}">
+      return `
         <span class="dx-response-card__head"><span class="dx-response-card__type">${escapeHtml(label)} &middot; resposta</span><span class="dx-response-card__glyph">${responseGlyph(card.type)}</span></span>
+        <span class="dx-response-card__visual" aria-hidden="true">${responseGlyph(card.type)}</span>
         <span class="dx-response-card__body">
           <strong class="dx-response-card__name">${escapeHtml(card.name)}</strong>
           <span class="dx-response-card__effect">${escapeHtml(card.effect)}</span>
-          <span class="dx-response-card__keywords">${card.keywords.map(escapeHtml).join(' &middot; ')}</span>
+          <span class="dx-response-card__keywords">${card.keywords.map((keyword) => `<b>${escapeHtml(keyword)}</b>`).join('')}</span>
           <span class="dx-response-card__numbers"><span>Resposta <b>${card.response}</b></span><span>Resolu&ccedil;&atilde;o <b>${card.resolution}</b></span></span>
         </span>
-      </button>`;
+      `;
     }
 
     function renderIntro() {
@@ -2492,20 +2578,31 @@
       const scenarios = (state.dailyManifest?.scenarios || []).map(scenarioWithArt);
       const selected = scenarios.find((scenario) => scenario.id === state.selectedScenarioId) || null;
       panel(`
-        <div class="dx-phase-head"><span class="dx-tag">Escolha do cen&aacute;rio</span></div>
-        <p style="color:var(--n5);font-size:14px;margin:0 0 8px;font-weight:600">Escolha um cen&aacute;rio. A partida s&oacute; come&ccedil;a quando voc&ecirc; confirmar.</p>
-        <div class="dx-field-grid" id="field-grid">
-          ${scenarios.map((scenario) => `<button class="dx-field-card${selected?.id === scenario.id ? ' is-selected' : ''}" type="button" data-scenario-id="${escapeHtml(scenario.id)}" aria-label="Escolher ${escapeHtml(scenario.name)}">
-            <span class="dx-field-card-back"><span class="dx-field-q">?</span></span>
-            <span class="dx-field-card-front">
-              <span class="dx-field-category">${escapeHtml(scenario.category)}</span>
-              <span class="theme-card-art" style="background-image:url('${scenario.image}');height:80px;margin:6px 0;border:var(--b1);border-radius:var(--r2)"></span>
-              <strong class="dx-field-name">${escapeHtml(scenario.name)}</strong>
-              <span class="dx-field-desc">${escapeHtml(scenario.rule)}</span>
-            </span>
-          </button>`).join('')}
-        </div>
-        ${selected ? `<div class="dx-field-confirmation"><div><strong>${escapeHtml(selected.name)}</strong><span>${escapeHtml(selected.category)} &middot; cen&aacute;rio selecionado</span></div><button class="dx-btn dx-btn-y is-small" id="confirm-field" type="button">Confirmar cen&aacute;rio</button></div>` : ''}
+        <section class="dx-field-screen">
+          <div class="dx-field-copy">
+            <span class="dx-tag">Escolha do cen&aacute;rio</span>
+            <h1>Defina o<br><strong>confronto.</strong></h1>
+            <p>Vire uma carta para revelar o cen&aacute;rio de hoje. Depois da escolha, confirme para iniciar a partida.</p>
+          </div>
+          <div>
+            <div class="dx-field-grid" id="field-grid">
+              ${scenarios.map((scenario) => {
+                const isSelected = selected?.id === scenario.id;
+                const locked = Boolean(selected && !isSelected);
+                return `<button class="dx-field-card${isSelected ? ' is-selected' : ''}${locked ? ' is-locked' : ''}" type="button" data-scenario-id="${escapeHtml(scenario.id)}" aria-label="Escolher ${escapeHtml(scenario.name)}"${locked ? ' disabled' : ''}>
+                  <span class="dx-field-card-back"><span class="dx-field-q">?</span></span>
+                  <span class="dx-field-card-front">
+                    <span class="dx-field-category">${escapeHtml(scenario.category)}</span>
+                    <span class="theme-card-art" style="background-image:url('${scenario.image}');height:80px;margin:6px 0;border:var(--b1);border-radius:var(--r2)"></span>
+                    <strong class="dx-field-name">${escapeHtml(scenario.name)}</strong>
+                    <span class="dx-field-desc">${escapeHtml(scenario.rule)}</span>
+                  </span>
+                </button>`;
+              }).join('')}
+            </div>
+            ${selected ? `<div class="dx-field-confirmation"><div><strong>${escapeHtml(selected.name)}</strong><span>${escapeHtml(selected.category)} &middot; cen&aacute;rio escolhido</span></div><button class="dx-btn dx-btn-y is-small" id="confirm-field" type="button">Confirmar cen&aacute;rio</button></div>` : ''}
+          </div>
+        </section>
       `);
       document.getElementById('dx-panel')?.classList.add('is-game-screen');
       document.querySelectorAll('[data-scenario-id]').forEach((button) => {
@@ -2565,7 +2662,7 @@
       state.previousCardId = null; state.roundHistory = state.serverGame?.round_history || []; state.conditions = new Set(state.serverGame?.conditions || []); state.transcript = [];
       state.reorganizeUsed = !state.serverGame?.reorganize_available; state.pendingReorganization = null; state.perfectResponses = 0; state.combosTriggered = [];
       state.currentThreat = state.serverGame?.threat || null;
-      state.resolutionMessage = ''; state.dailyResult = null; state.savingResult = false;
+      state.resolutionMessage = ''; state.resolutionSnapshot = null; state.resolvingRound = false; state.dailyResult = null; state.savingResult = false;
     }
 
     function renderDuel() {
@@ -2573,31 +2670,22 @@
       panel(`
         <div class="dx-arena-v2" id="daily-duel-arena">
           <div class="dx-duel-hud">
-            <div class="dx-hud-meter dx-hud-meter--pressure"><span class="dx-hud-label">Sentury &middot; Press&atilde;o</span><strong class="dx-hud-number" id="pressure-number">100</strong><span class="dx-hud-bar"><span class="dx-hud-fill dx-hud-fill--pressure" id="pressure-fill" style="width:100%"></span></span></div>
+            <div class="dx-hud-meter dx-hud-meter--pressure"><div class="dx-hud-persona" id="sentury-persona"><span class="dx-sentury-face" aria-hidden="true"><i class="dx-sentury-eye"></i><i class="dx-sentury-eye"></i></span><div><span class="dx-hud-label">Sentury / Press&atilde;o</span><strong class="dx-hud-number" id="pressure-number">100</strong></div></div><span class="dx-hud-bar"><span class="dx-hud-fill dx-hud-fill--pressure" id="pressure-fill" style="width:100%"></span></span></div>
             <span class="dx-round-count" id="daily-round-count">Rodada 1/5</span>
             <div class="dx-hud-meter dx-hud-meter--trust"><span class="dx-hud-label">Voc&ecirc; &middot; Confian&ccedil;a</span><strong class="dx-hud-number" id="trust-number">100</strong><span class="dx-hud-bar"><span class="dx-hud-fill dx-hud-fill--trust" id="trust-fill" style="width:100%"></span></span></div>
           </div>
-          <div class="dx-duel-board">
-            <aside class="dx-scenario-panel">
-              <div class="dx-scenario-face"><span class="dx-scenario-icon">EC</span><div><span class="dx-scenario-category">Cen&aacute;rio ${escapeHtml(state.field.category)}</span><h2 class="dx-scenario-name">${escapeHtml(state.field.name)}</h2></div></div>
-              <div class="dx-rule-box"><strong>Regra ativa</strong><p>${escapeHtml(state.field.rule)}</p></div>
-              <div><span class="dx-condition" id="conditions-label">Sem condi&ccedil;&otilde;es ativas</span></div>
-              <div class="dx-round-history" id="daily-round-history"></div>
-            </aside>
-            <section class="dx-battle-zone" aria-live="polite">
-              <div class="dx-battle-heading"><span>Campo da rodada</span><p>Sentury revela a jogada; voc&ecirc; coloca uma resposta em campo.</p></div>
-              <div class="dx-battlefield">
-                <article class="dx-threat-card" id="daily-threat"></article>
-                <div class="dx-battle-vs" aria-hidden="true">VS</div>
-                <section class="dx-response-stage" id="daily-response-stage"></section>
-              </div>
-              <section class="dx-battle-history-wrap"><div class="dx-battle-history-title">Confrontos resolvidos</div><div class="dx-battle-history" id="daily-battle-history"></div></section>
-            </section>
-          </div>
+          <section class="dx-scenario-strip"><div class="dx-scenario-face"><span class="dx-scenario-icon">EC</span><div><span class="dx-scenario-category">Cen&aacute;rio ${escapeHtml(state.field.category)}</span><h2 class="dx-scenario-name">${escapeHtml(state.field.name)}</h2></div></div><div class="dx-rule-box"><strong>Regra ativa</strong><p>${escapeHtml(state.field.rule)} <span class="dx-condition" id="conditions-label"></span></p></div><div class="dx-round-timeline" id="daily-round-history" aria-label="Progresso das rodadas"></div></section>
+          <section class="dx-battle-zone" aria-live="polite">
+            <div class="dx-battle-heading"><span>Campo da rodada</span><p>Sentury revela a amea&ccedil;a. Voc&ecirc; escolhe a resposta.</p></div>
+            <div class="dx-battlefield">
+              <article class="dx-threat-card" id="daily-threat"></article>
+              <section class="dx-round-feedback" id="daily-round-feedback"></section>
+              <section class="dx-response-stage" id="daily-response-stage"></section>
+            </div>
+          </section>
           <div class="dx-hand-wrap">
             <div class="dx-hand-title"><strong>Sua m&atilde;o</strong><span>Selecione uma resposta antes de confirmar</span></div>
             <div class="dx-response-hand" id="daily-response-hand"></div>
-            <p class="dx-resolution-note" id="daily-resolution-note"></p>
           </div>
         </div>
       `, true);
@@ -2605,7 +2693,7 @@
       startRound();
     }
 
-    function activeThreat() { return state.currentThreat || null; }
+    function activeThreat() { return state.resolutionSnapshot?.threat || state.currentThreat || null; }
 
     function syncServerGame(serverState) {
       state.serverGame = serverState;
@@ -2645,34 +2733,57 @@
       document.getElementById('trust-number').textContent = state.trust;
       document.getElementById('pressure-fill').style.width = `${state.pressure}%`;
       document.getElementById('trust-fill').style.width = `${state.trust}%`;
-      document.getElementById('daily-round-count').textContent = `Rodada ${state.round}/${state.maxRounds}`;
-      document.getElementById('conditions-label').textContent = state.conditions.size ? `Condi\u00e7\u00f5es: ${[...state.conditions].join(' \u00b7 ')}` : 'Sem condi\u00e7\u00f5es ativas';
+      document.getElementById('daily-round-count').textContent = `Rodada ${state.resolutionSnapshot?.round?.round || state.round}/${state.maxRounds}`;
+      document.getElementById('conditions-label').textContent = state.conditions.size ? `\u00b7 Condi\u00e7\u00f5es: ${[...state.conditions].join(' \u00b7 ')}` : '';
+      const persona = document.getElementById('sentury-persona');
+      persona?.classList.toggle('is-evaluating', Boolean(state.resolvingRound && !state.resolutionSnapshot));
       document.getElementById('daily-threat').innerHTML = `
-        <div class="dx-sentury-actor${state.resolvingRound ? ' is-evaluating' : ''}"><span class="dx-sentury-face"><i class="dx-sentury-eye"></i><i class="dx-sentury-eye"></i></span><span class="dx-sentury-name">Sentury</span><span class="dx-sentury-status">${state.resolvingRound ? 'avaliando' : 'jogada revelada'}</span></div>
-        <div><span class="dx-threat-kicker">Carta do oponente</span><h2 class="dx-threat-name">${escapeHtml(threat.name)}</h2><p class="dx-threat-copy">${escapeHtml(threat.copy)}</p></div>
-        <div class="dx-threat-meta"><span class="dx-threat-impact"><strong>${threat.impact}</strong> impacto</span><span class="dx-vulnerability">Vulner&aacute;vel a:<br>${threat.vulnerabilities.map(escapeHtml).join(' &middot; ')}</span></div>`;
+        <div class="dx-threat-card__head"><span class="dx-threat-kicker">Amea&ccedil;a revelada</span><span class="dx-threat-impact"><strong>${threat.impact}</strong> impacto</span></div>
+        <div class="dx-threat-card__visual" style="background-image:linear-gradient(rgba(10,10,10,.2),rgba(10,10,10,.58)),url('${state.field.image}')"><span>!</span></div>
+        <div class="dx-threat-card__body"><h2 class="dx-threat-name">${escapeHtml(threat.name)}</h2><p class="dx-threat-copy">${escapeHtml(threat.copy)}</p><div class="dx-vulnerability"><span>Vulner&aacute;vel a</span><div>${threat.vulnerabilities.map((keyword) => `<b>${escapeHtml(keyword)}</b>`).join('')}</div></div></div>`;
       renderResponseStage();
+      renderRoundFeedback();
       renderDailyHand();
       renderDailyHistory();
-      const note = document.getElementById('daily-resolution-note');
-      note.textContent = state.resolutionMessage || '';
-      note.className = `dx-resolution-note${state.resolutionMessageType ? ` ${state.resolutionMessageType}` : ''}`;
     }
 
     function renderResponseStage() {
       const stage = document.getElementById('daily-response-stage');
-      const selected = dailyCard(state.selectedCardId);
+      const selected = state.resolutionSnapshot?.card || dailyCard(state.selectedCardId);
       if (!selected) {
         stage.className = 'dx-response-stage';
-        stage.innerHTML = `<div class="dx-player-slot"><span class="dx-player-slot-label">Sua carta em campo</span><strong>Escolha uma resposta</strong><p>Compare as palavras-chave da carta do Sentury e coloque sua resposta aqui.</p></div>`;
+        stage.innerHTML = `<div class="dx-player-slot"><span class="dx-player-slot-label">Sua resposta</span><strong>Escolha uma carta</strong><p>Uma carta da sua m&atilde;o entra aqui para enfrentar a amea&ccedil;a.</p></div>`;
+        return;
+      }
+      stage.className = 'dx-response-stage is-selected';
+      stage.innerHTML = `<div class="dx-stage-response-card">${renderResponseCardFace(selected)}</div>`;
+    }
+
+    function renderRoundFeedback() {
+      const feedback = document.getElementById('daily-round-feedback');
+      const snapshot = state.resolutionSnapshot;
+      const selected = dailyCard(state.selectedCardId);
+      if (snapshot) {
+        const contained = snapshot.round.remaining_impact === 0;
+        feedback.className = `dx-round-feedback ${contained ? 'is-success' : 'is-risk'}`;
+        feedback.innerHTML = `<span class="dx-round-feedback-step">R${snapshot.round.round}</span><div><span class="dx-feedback-kicker">Resultado confirmado</span><strong>${contained ? 'Amea&ccedil;a contida' : 'Impacto residual'}</strong><p>${contained ? `Press&atilde;o -${snapshot.pressureDelta}${snapshot.round.combo ? ` &middot; ${escapeHtml(snapshot.round.combo)}` : ''}` : `${snapshot.round.remaining_impact} de impacto chegou &agrave; Confian&ccedil;a${snapshot.trustDelta ? ` &middot; Confian&ccedil;a -${snapshot.trustDelta}` : ''}.`}</p></div>`;
+        return;
+      }
+      if (state.resolvingRound && selected) {
+        feedback.className = 'dx-round-feedback is-evaluating';
+        feedback.innerHTML = `<span class="dx-round-feedback-step">...</span><div><span class="dx-feedback-kicker">Confronto em an&aacute;lise</span><strong>Sentury est&aacute; avaliando</strong><p>${escapeHtml(selected.name)} encontra ${escapeHtml(activeThreat().name)} no campo.</p></div>`;
+        return;
+      }
+      if (!selected) {
+        feedback.className = 'dx-round-feedback';
+        feedback.innerHTML = `<span class="dx-round-feedback-step">VS</span><div><span class="dx-feedback-kicker">Sua vez</span><strong>Escolha sua resposta</strong><p>Compare as vulnerabilidades da amea&ccedil;a com as palavras-chave da sua m&atilde;o.</p></div>`;
         return;
       }
       const preview = previewResponse(selected);
-      const matchText = preview.matched.length ? `<span class="is-match">Ativa ${preview.matched.map(escapeHtml).join(' &middot; ')}</span>` : 'N&atilde;o ativa vulnerabilidade desta amea&ccedil;a';
-      const risk = selected.risk ? `<span class="dx-preview-risk">Risco: ${escapeHtml(selected.risk)}</span>` : '';
-      stage.className = 'dx-response-stage is-selected';
-      stage.innerHTML = `<div class="dx-response-preview"><span class="dx-preview-emblem">${responseGlyph(selected.type)}</span><div><span class="dx-player-slot-label">Sua carta em campo</span><h3 class="dx-preview-title">${escapeHtml(selected.name)}</h3><p class="dx-preview-details">Conten&ccedil;&atilde;o estimada: <strong>${preview.estimate}</strong> &middot; ${matchText}<br>Impacto restante: ${preview.remaining} &middot; Press&atilde;o: -${selected.resolution}<br>${risk}${preview.ruleTriggered ? '<span class="dx-preview-risk">Regra do cen&aacute;rio ser&aacute; ativada.</span>' : ''}</p></div></div>
-        <div class="dx-response-actions">${state.resolvingRound ? '<span class="dx-player-slot-label">Sentury avaliando...</span>' : '<button class="dx-btn dx-btn-y is-small" id="confirm-response" type="button">Confirmar confronto</button>'}</div>`;
+      const matches = preview.matched.length ? preview.matched.map((keyword) => `<li class="is-match">${escapeHtml(keyword)} encontrada</li>`).join('') : '<li class="is-risk">Nenhuma vulnerabilidade encontrada</li>';
+      const missing = activeThreat().vulnerabilities.filter((keyword) => !preview.matched.includes(keyword)).map((keyword) => `<li class="is-risk">${escapeHtml(keyword)} ausente</li>`).join('');
+      feedback.className = 'dx-round-feedback is-selected';
+      feedback.innerHTML = `<span class="dx-round-feedback-step">VS</span><div><span class="dx-feedback-kicker">Confronto previsto</span><ul class="dx-feedback-matches">${matches}${missing}</ul><div class="dx-feedback-metrics"><span>Conten&ccedil;&atilde;o <b>${Math.min(activeThreat().impact, preview.containment)}/${activeThreat().impact}</b></span><span>Risco residual <b>${preview.remaining}</b></span></div><button class="dx-btn dx-btn-y is-small" id="confirm-response" type="button">Jogar esta carta</button></div>`;
       document.getElementById('confirm-response')?.addEventListener('click', confirmResponse);
     }
 
@@ -2700,10 +2811,14 @@
 
     function renderDailyHistory() {
       const history = document.getElementById('daily-round-history');
-      history.innerHTML = state.roundHistory.map((round) => `<span class="dx-round-chip ${round.remaining_impact === 0 ? 'is-good' : 'is-risk'}">R${round.round} ${round.remaining_impact === 0 ? '&#10003;' : '!'}</span>`).join('') + `<span class="dx-round-chip is-current">R${state.round}</span>`;
-      const battleHistory = document.getElementById('daily-battle-history');
-      if (!battleHistory) return;
-      battleHistory.innerHTML = state.roundHistory.length ? state.roundHistory.map((round) => `<article class="dx-history-match ${round.remaining_impact === 0 ? 'is-contained' : 'is-impact'}"><span class="dx-history-round">R${round.round}</span><span class="dx-history-card dx-history-card--enemy">${escapeHtml(round.threat.name)}</span><span class="dx-history-vs">&times;</span><span class="dx-history-card">${escapeHtml(round.card.name)}</span><span class="dx-history-result">${round.remaining_impact === 0 ? 'contida' : `${round.remaining_impact} impacto`}</span></article>`).join('') : '<p class="dx-history-empty">Os confrontos resolvidos aparecer&atilde;o aqui.</p>';
+      history.innerHTML = Array.from({ length: state.maxRounds }, (_, index) => {
+        const number = index + 1;
+        const resolved = state.roundHistory.find((round) => round.round === number);
+        const current = number === state.round && !state.resolutionSnapshot;
+        const stateClass = resolved ? (resolved.remaining_impact === 0 ? 'is-good' : 'is-risk') : (current ? 'is-current' : '');
+        const marker = resolved ? (resolved.remaining_impact === 0 ? '&#10003;' : '!') : (current ? 'atual' : '&mdash;');
+        return `<span class="dx-round-chip ${stateClass}"><b>R${number}</b><i>${marker}</i></span>`;
+      }).join('');
     }
 
     function startRound() {
@@ -2737,6 +2852,8 @@
       const card = dailyCard(state.selectedCardId);
       const threat = activeThreat();
       if (!card || !threat || state.resolvingRound) return;
+      const pressureBefore = state.pressure;
+      const trustBefore = state.trust;
       state.resolvingRound = true;
       state.resolutionMessage = 'Sentury está avaliando o confronto...';
       state.resolutionMessageType = '';
@@ -2746,22 +2863,25 @@
           method: 'POST', body: JSON.stringify({ run_id: state.dailyRun.run_id, card_id: card.id })
         });
         const round = response.round;
-        state.previousCardId = card.id;
-        state.selectedCardId = null;
         if (round.perfect) state.perfectResponses += 1;
         if (round.combo) state.combosTriggered.push(round.combo);
         state.resolutionMessage = round.perfect ? `AMEA\u00c7A CONTIDA${round.combo ? ` \u00b7 ${round.combo}` : ''}` : `Impacto restante: ${round.remaining_impact}${round.rule_triggered ? ' \u00b7 regra ativa' : ''}`;
         state.resolutionMessageType = round.perfect ? 'is-success' : 'is-danger';
         audio.playReveal(round.perfect);
+        state.previousCardId = card.id;
+        state.selectedCardId = null;
+        state.resolutionSnapshot = { threat: { ...threat }, card: { ...card }, round, pressureDelta: Math.max(0, pressureBefore - round.pressure_after), trustDelta: Math.max(0, trustBefore - round.trust_after) };
         if (response.complete) {
           state.dailyResult = response.result;
-          state.resolvingRound = false;
-          timers.push(setTimeout(() => setPhase('results'), 900));
+          state.pressure = response.result.pressure_remaining;
+          state.trust = response.result.trust_remaining;
+          renderDailyArena();
+          timers.push(setTimeout(() => { state.resolvingRound = false; setPhase('results'); }, 1400));
           return;
         }
         syncServerGame(response.state);
         renderDailyArena();
-        timers.push(setTimeout(() => { state.resolvingRound = false; startRound(); }, 900));
+        timers.push(setTimeout(() => { state.resolutionSnapshot = null; state.resolvingRound = false; startRound(); }, 1400));
       } catch (error) {
         state.resolvingRound = false;
         state.resolutionMessage = error.message;
