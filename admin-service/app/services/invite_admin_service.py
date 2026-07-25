@@ -25,7 +25,8 @@ class InviteAdminService:
     RECOVERY_TTL = timedelta(minutes=30)
 
     async def _grant(self, grant_type: str, *, nickname: str | None = None,
-                     target_user_id: str | None = None, created_by: str = "admin") -> Dict[str, Any]:
+                     target_user_id: str | None = None, created_by: str = "admin",
+                     replace_active: bool = True) -> Dict[str, Any]:
         expires = datetime.now(timezone.utc) + (self.RECOVERY_TTL if grant_type == "RECOVERY" else self.EVENT_TTL)
         try:
             data = await supabase_client.call_rpc("create_passkey_grant", {
@@ -34,6 +35,7 @@ class InviteAdminService:
                 "p_target_user_id": target_user_id,
                 "p_expires_at": expires.isoformat(),
                 "p_created_by": created_by,
+                "p_replace_active": replace_active,
             })
             return {"ok": True, "grant": data}
         except Exception as exc:
@@ -44,13 +46,25 @@ class InviteAdminService:
         nickname = (nickname or "").strip()
         if not nickname:
             return {"ok": False, "nickname": nickname, "error": "nickname vazio"}
-        result = await self._grant("INVITE", nickname=nickname, created_by=created_by)
+        result = await self._grant("INVITE", nickname=nickname, created_by=created_by, replace_active=False)
         if not result["ok"]:
             return {"ok": False, "nickname": nickname, "error": result["error"]}
         return {"ok": True, "invite": result["grant"]}
 
     async def create_bulk(self, nicknames: List[str], created_by: str = "admin") -> Dict[str, Any]:
-        results = [await self.create_invite(nickname, created_by) for nickname in nicknames if (nickname or "").strip()]
+        cleaned = [str(nickname or "").strip() for nickname in nicknames]
+        if not cleaned:
+            return {"total": 0, "created": 0, "failed": 0, "results": []}
+        rows = await supabase_client.call_rpc("create_passkey_invite_batch", {
+            "p_nicknames": cleaned,
+            "p_created_by": created_by,
+        })
+        results = [{
+            "ok": not bool(row.get("error")),
+            "nickname": row.get("nickname", ""),
+            "invite": row.get("grant") or None,
+            "error": row.get("error") or None,
+        } for row in (rows or [])]
         return {
             "total": len(results),
             "created": sum(result.get("ok", False) for result in results),
@@ -68,6 +82,56 @@ class InviteAdminService:
         # Security/audit events reference grants. They are never physically
         # deleted from the admin route anymore.
         return {"deleted": 0, "message": "Passkey grants are retained for audit."}
+
+    async def revoke_grant(self, grant_id: str, reason: str = "admin_revoked") -> Dict[str, Any]:
+        return await supabase_client.call_rpc("revoke_passkey_grant", {
+            "p_grant_id": grant_id,
+            "p_reason": reason,
+        })
+
+    async def revoke_issued_invites(self, reason: str = "admin_revoked_batch") -> int:
+        result = await supabase_client.call_rpc("revoke_issued_passkey_invites", {
+            "p_reason": reason,
+        })
+        return int(result or 0)
+
+    async def reissue_grant(self, grant_id: str, created_by: str = "admin") -> Dict[str, Any]:
+        rows = (supabase_client.table("passkey_grants")
+                .select("id,grant_type,state,nickname,target_user_id")
+                .eq("id", grant_id).limit(1).execute().data or [])
+        if not rows:
+            return {"ok": False, "error": "grant_not_found"}
+        grant = rows[0]
+
+        if grant["state"] == "ISSUED":
+            try:
+                await self.revoke_grant(grant_id, "reissued_by_admin")
+            except Exception as exc:
+                return {"ok": False, "error": _err_message(exc)}
+
+        if grant["grant_type"] == "INVITE":
+            users = (supabase_client.table("usuarios")
+                     .select("id").eq("nickname", grant["nickname"]).limit(1).execute().data or [])
+            if users:
+                result = await self.create_recovery(users[0]["id"], created_by)
+                mode = "RECOVERY"
+            else:
+                result = await self.create_invite(grant["nickname"], created_by)
+                mode = "INVITE"
+        else:
+            result = await self._grant(
+                grant["grant_type"],
+                target_user_id=grant.get("target_user_id"),
+                created_by=created_by,
+            )
+            mode = grant["grant_type"]
+
+        if not result.get("ok"):
+            return {"ok": False, "error": result.get("error", "grant_reissue_failed")}
+        issued_grant = result.get("grant") or result.get("invite")
+        if not issued_grant:
+            return {"ok": False, "error": "grant_reissue_failed"}
+        return {"ok": True, "grant": issued_grant, "grant_type": mode}
 
     async def create_recovery(self, user_id: str, created_by: str = "admin") -> Dict[str, Any]:
         return await self._grant("RECOVERY", target_user_id=user_id, created_by=created_by)

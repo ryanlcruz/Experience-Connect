@@ -19,17 +19,12 @@ class CreateInvite(BaseModel):
 
 
 class BulkInvite(BaseModel):
-    nicknames: List[str] = Field(default_factory=list)
+    nicknames: List[str] = Field(min_length=1, max_length=10000)
     created_by: str = Field(default="admin", min_length=1, max_length=100)
 
 
-class BulkRecipient(BaseModel):
-    nickname: str = Field(min_length=1, max_length=100)
-    email: str | None = Field(default=None, max_length=320)
-
-
 class BulkInviteCsv(BaseModel):
-    recipients: List[BulkRecipient] = Field(min_length=1, max_length=10000)
+    nicknames: List[str] = Field(min_length=1, max_length=10000)
     created_by: str = Field(default="admin", min_length=1, max_length=100)
 
 
@@ -38,6 +33,11 @@ class RecoveryRequest(BaseModel):
 
 
 class RevokePasskeyRequest(BaseModel):
+    reason: str = Field(default="admin_revoked", min_length=1, max_length=200)
+
+
+class GrantActionRequest(BaseModel):
+    created_by: str = Field(default="admin", min_length=1, max_length=100)
     reason: str = Field(default="admin_revoked", min_length=1, max_length=200)
 
 
@@ -64,25 +64,23 @@ async def create_bulk(body: BulkInvite) -> Dict[str, Any]:
 async def create_bulk_csv(body: BulkInviteCsv) -> StreamingResponse:
     """Create grants and return the one-time link/code values as a CSV.
 
-    The optional email is never written to the game database; it is carried
-    straight back to the operator's external mail-delivery service.
+    Raw values are returned only in this download and are never persisted.
     """
     output = io.StringIO(newline="")
     writer = csv.DictWriter(output, fieldnames=[
-        "email", "nickname", "activation_link", "activation_code", "expires_at", "status", "error"
+        "nickname", "activation_link", "activation_code", "expires_at", "status", "error"
     ])
     writer.writeheader()
-    for recipient in body.recipients:
-        result = await invite_admin_service.create_invite(recipient.nickname, body.created_by)
-        invite = result.get("invite") or {}
+    result = await invite_admin_service.create_bulk(body.nicknames, body.created_by)
+    for entry in result["results"]:
+        invite = entry.get("invite") or {}
         writer.writerow({
-            "email": recipient.email or "",
-            "nickname": recipient.nickname,
+            "nickname": entry.get("nickname", ""),
             "activation_link": invite.get("invite_url", ""),
             "activation_code": invite.get("invite_code", ""),
             "expires_at": invite.get("invite_expires", ""),
-            "status": "CREATED" if result.get("ok") else "FAILED",
-            "error": "" if result.get("ok") else result.get("error", "grant_failed"),
+            "status": "CREATED" if entry.get("ok") else "FAILED",
+            "error": "" if entry.get("ok") else entry.get("error", "grant_failed"),
         })
     output.seek(0)
     return StreamingResponse(
@@ -96,6 +94,29 @@ async def create_bulk_csv(body: BulkInviteCsv) -> StreamingResponse:
 async def clear_used() -> Dict[str, Any]:
     # Preserved for clients of the old panel, but passkey audit records remain.
     return await invite_admin_service.clear_used_invites()
+
+
+@router.post("/invites/revoke-issued")
+async def revoke_issued_invites(body: GrantActionRequest) -> Dict[str, Any]:
+    revoked = await invite_admin_service.revoke_issued_invites(body.reason)
+    return {"ok": True, "revoked": revoked}
+
+
+@router.post("/invites/{grant_id}/reissue", status_code=201)
+async def reissue_invite(grant_id: str, body: GrantActionRequest) -> Dict[str, Any]:
+    result = await invite_admin_service.reissue_grant(grant_id, body.created_by)
+    if not result.get("ok"):
+        raise HTTPException(status_code=422, detail=result.get("error", "Falha ao reemitir convite"))
+    return result
+
+
+@router.post("/invites/{grant_id}/revoke")
+async def revoke_invite(grant_id: str, body: GrantActionRequest) -> Dict[str, Any]:
+    try:
+        grant = await invite_admin_service.revoke_grant(grant_id, body.reason)
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return {"ok": True, "grant": grant}
 
 
 @router.post("/passkeys/migrations")

@@ -489,11 +489,8 @@ document.getElementById('inv-bulk-btn').addEventListener('click', createBulkInvi
 document.getElementById('inv-reload').addEventListener('click', loadInvites);
 document.getElementById('inv-download').addEventListener('click', downloadInvitesCsv);
 document.getElementById('inv-file').addEventListener('change', readInviteFile);
-document.getElementById('inv-clear-used').addEventListener('click', async () => {
-  if (!confirm('Apagar do banco todos os convites já USADOS?')) return;
-  try { const r = await api('/admin/invites/clear-used', { method: 'POST', body: '{}' }); toast(`${r.deleted} convites usados apagados.`); loadInvites(); }
-  catch (e) { toast(e.message, true); }
-});
+document.getElementById('inv-only-issued').addEventListener('change', loadInvites);
+document.getElementById('inv-revoke-issued').addEventListener('click', revokeIssuedInvites);
 
 async function createInvite() {
   const nick = document.getElementById('inv-nick').value.trim();
@@ -513,17 +510,60 @@ function readInviteFile(ev) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    const nicks = String(reader.result).split(/\r?\n/).map(l => l.split(',')[0].trim()).filter(Boolean);
-    // remove um possivel cabecalho "nickname"
-    if (nicks[0] && /^nick|nome|user/i.test(nicks[0])) nicks.shift();
-    document.getElementById('inv-bulk').value = nicks.join('\n');
-    toast(`${nicks.length} nicknames carregados do arquivo.`);
+    const parsed = parseInviteNicknames(String(reader.result));
+    if (parsed.duplicate) {
+      toast(`Nickname repetido no arquivo: ${parsed.duplicate}.`, true);
+      return;
+    }
+    document.getElementById('inv-bulk').value = parsed.nicknames.join('\n');
+    toast(`${parsed.nicknames.length} nicknames carregados do arquivo.`);
   };
   reader.readAsText(file);
 }
 
+function parseDelimitedLine(line, delimiter) {
+  const values = [];
+  let value = '';
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (char === '"') {
+      if (quoted && line[index + 1] === '"') { value += '"'; index += 1; }
+      else quoted = !quoted;
+    } else if (char === delimiter && !quoted) {
+      values.push(value.trim());
+      value = '';
+    } else value += char;
+  }
+  values.push(value.trim());
+  return values;
+}
+
+function parseInviteNicknames(source) {
+  const lines = String(source || '').replace(/^\uFEFF/, '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (!lines.length) return { nicknames: [], duplicate: null };
+  const firstLine = lines[0];
+  const delimiter = firstLine.includes(';') ? ';' : (firstLine.includes('\t') ? '\t' : ',');
+  const rows = lines.map(line => parseDelimitedLine(line, delimiter));
+  if (/^(nickname|nick|nome|usu[aá]rio|usuario|user)$/i.test(rows[0][0] || '')) rows.shift();
+
+  const seen = new Set();
+  const nicknames = [];
+  for (const row of rows) {
+    const nickname = String(row[0] || '').trim();
+    if (!nickname) continue;
+    const key = nickname.toLocaleLowerCase('pt-BR');
+    if (seen.has(key)) return { nicknames, duplicate: nickname };
+    seen.add(key);
+    nicknames.push(nickname);
+  }
+  return { nicknames, duplicate: null };
+}
+
 async function createBulkInvites() {
-  const nicknames = document.getElementById('inv-bulk').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const parsed = parseInviteNicknames(document.getElementById('inv-bulk').value);
+  const nicknames = parsed.nicknames;
+  if (parsed.duplicate) { toast(`Nickname repetido: ${parsed.duplicate}. Corrija antes de emitir.`, true); return; }
   if (!nicknames.length) { toast('Cole ou envie a lista', true); return; }
   if (!confirm(`Criar ${nicknames.length} convites?`)) return;
   const box = document.getElementById('inv-bulk-result');
@@ -532,7 +572,7 @@ async function createBulkInvites() {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipients: nicknames.map(nickname => ({ nickname })), created_by: 'nexus-panel' }),
+      body: JSON.stringify({ nicknames, created_by: 'nexus-panel' }),
     });
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
@@ -546,7 +586,7 @@ async function createBulkInvites() {
     download.click();
     URL.revokeObjectURL(url);
     box.hidden = false;
-    box.textContent = `Arquivo com ${nicknames.length} emissão(ões) baixado. Confira a coluna status antes do envio.`;
+    box.textContent = `CSV com ${nicknames.length} emissão(ões) baixado. Confira status e erro antes de compartilhar cada link e código.`;
     toast('CSV de ativação baixado.');
     loadInvites();
   } catch (e) { toast(e.message, true); }
@@ -557,8 +597,10 @@ async function loadInvites() {
   try {
     invCache = await api('/admin/invites');
     tbody.innerHTML = '';
-    document.getElementById('inv-empty').hidden = invCache.length > 0;
-    for (const i of invCache) {
+    const onlyIssued = document.getElementById('inv-only-issued').checked;
+    const rows = onlyIssued ? invCache.filter(i => i.state === 'ISSUED') : invCache;
+    document.getElementById('inv-empty').hidden = rows.length > 0;
+    for (const i of rows) {
       const exp = i.expires_at ? new Date(i.expires_at).toLocaleDateString('pt-BR') : '—';
       const issued = i.created_at ? new Date(i.created_at).toLocaleString('pt-BR') : '—';
       const tr = document.createElement('tr');
@@ -567,10 +609,77 @@ async function loadInvites() {
         <td>${esc(i.grant_type || '—')}</td>
         <td>${esc(i.state || '—')}</td>
         <td>${exp}</td>
-        <td>${issued}</td>`;
+        <td>${issued}</td>
+        <td class="actions"></td>`;
+      const actions = tr.querySelector('.actions');
+      const reissue = document.createElement('button');
+      reissue.className = 'mini';
+      reissue.textContent = i.state === 'USED' ? 'recuperação' : 'reemitir';
+      reissue.addEventListener('click', () => reissueInvite(i));
+      actions.appendChild(reissue);
+      if (i.state === 'ISSUED') {
+        const revoke = document.createElement('button');
+        revoke.className = 'mini danger';
+        revoke.textContent = 'revogar';
+        revoke.addEventListener('click', () => revokeInvite(i));
+        actions.appendChild(revoke);
+      }
       tbody.appendChild(tr);
     }
   } catch (e) { toast('Erro ao carregar convites: ' + e.message, true); }
+}
+
+function showReissuedGrant(nickname, result) {
+  const recovery = result.grant_type !== 'INVITE';
+  showPasskeyGrant({
+    title: recovery ? 'Acesso por passkey reemitido' : 'Convite por passkey reemitido',
+    summary: recovery ? `Novo acesso emitido para ${nickname}.` : `Novo convite emitido para ${nickname}.`,
+    note: recovery
+      ? 'Envie o link e o código por canais separados. A emissão anterior foi encerrada.'
+      : 'Copie o link e o código agora e envie-os por canais separados. A emissão anterior foi encerrada.',
+    linkLabel: recovery ? 'Link de acesso' : 'Link de ativação',
+    codeLabel: recovery ? 'Código de acesso' : 'Código de ativação',
+    expiresFallback: recovery ? 'Válido por 30 minutos.' : 'Válido durante o evento.',
+    grant: result.grant,
+  });
+}
+
+async function reissueInvite(grant) {
+  const action = grant.state === 'USED' ? 'criar uma recuperação' : 'reemitir este convite';
+  if (!confirm(`Confirma ${action} para ${grant.nickname}? O link e o código anteriores deixarão de valer.`)) return;
+  try {
+    const result = await api(`/admin/invites/${encodeURIComponent(grant.id)}/reissue`, {
+      method: 'POST', body: JSON.stringify({ created_by: 'nexus-panel' }),
+    });
+    if (!result.grant?.invite_url || !result.grant?.invite_code) throw new Error('A reemissão não retornou link e código.');
+    showReissuedGrant(grant.nickname, result);
+    toast('Novo link e código emitidos.');
+    loadInvites();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function revokeInvite(grant) {
+  if (!confirm(`Revogar o convite pendente de ${grant.nickname}? Ele não poderá mais ser usado.`)) return;
+  try {
+    await api(`/admin/invites/${encodeURIComponent(grant.id)}/revoke`, {
+      method: 'POST', body: JSON.stringify({ reason: 'revogado_no_nexus' }),
+    });
+    toast('Convite revogado.');
+    loadInvites();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function revokeIssuedInvites() {
+  const count = invCache.filter(i => i.grant_type === 'INVITE' && i.state === 'ISSUED').length;
+  if (!count) { toast('Não há convites pendentes para revogar.'); return; }
+  if (!confirm(`Revogar os ${count} convites pendentes? Recuperações não serão afetadas.`)) return;
+  try {
+    const result = await api('/admin/invites/revoke-issued', {
+      method: 'POST', body: JSON.stringify({ reason: 'revogado_em_lote_no_nexus' }),
+    });
+    toast(`${result.revoked} convite(s) revogado(s).`);
+    loadInvites();
+  } catch (e) { toast(e.message, true); }
 }
 
 function downloadInvitesCsv() {

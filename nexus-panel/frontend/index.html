@@ -144,7 +144,7 @@
         <button id="inv-create">Criar convite</button>
       </div>
       <div class="card">
-        <h3>Em lote — um nickname por linha (ou envie um CSV/TXT)</h3>
+        <h3>Em lote — um nickname por linha (ou CSV/TXT com a coluna nickname)</h3>
         <textarea id="inv-bulk" rows="5" style="width:100%" placeholder="joao&#10;maria&#10;pedro"></textarea>
         <div class="inline" style="margin-top:.5rem">
           <input type="file" id="inv-file" accept=".csv,.txt">
@@ -156,13 +156,14 @@
         <div class="inline" style="justify-content:space-between">
           <h3 style="margin:0">Convites criados</h3>
           <div class="inline">
+            <label class="chk"><input type="checkbox" id="inv-only-issued"> só pendentes</label>
             <button id="inv-reload" class="mini">Recarregar</button>
-            <button id="inv-download" class="mini">Baixar CSV</button>
-            <button id="inv-clear-used" class="mini danger">Limpar usados</button>
+            <button id="inv-download" class="mini">Baixar histórico CSV</button>
+            <button id="inv-revoke-issued" class="mini danger">Revogar pendentes</button>
           </div>
         </div>
         <table id="inv-table">
-          <thead><tr><th>Nickname</th><th>Tipo</th><th>Status</th><th>Expira</th><th>Emitido em</th></tr></thead>
+          <thead><tr><th>Nickname</th><th>Tipo</th><th>Status</th><th>Expira</th><th>Emitido em</th><th>Ações</th></tr></thead>
           <tbody></tbody>
         </table>
         <p class="empty" id="inv-empty" hidden>Nenhum convite ainda.</p>
