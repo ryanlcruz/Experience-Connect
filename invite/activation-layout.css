@@ -53,12 +53,22 @@ body.activation-page {
   background: radial-gradient(ellipse at 54% 52%, transparent 66%, rgba(245, 240, 230, .34) 100%);
 }
 
+.activation-scene--invite::after {
+  display: none;
+}
+
 .activation-scene-stage {
   position: relative;
   width: 100%;
   max-width: 960px;
   aspect-ratio: 1672 / 941;
   container-type: inline-size;
+}
+
+.activation-scene-stage--invite {
+  width: min(100%, 760px);
+  max-width: 760px;
+  aspect-ratio: 1;
 }
 
 .activation-scene-image {
@@ -788,6 +798,11 @@ body.activation-page {
   .activation-scene-stage {
     max-width: none;
     width: 100vw;
+  }
+
+  .activation-scene-stage--invite {
+    width: min(100vw, 680px);
+    max-width: 680px;
   }
 
   .activation-scene::after,
