@@ -4,6 +4,72 @@
   var params = new URLSearchParams(window.location.search);
   var token = (params.get('token') || '').trim().toLowerCase();
   var state = { accountExists: false, avatar: null, nickname: null };
+  var activationMorphGeneration = 0;
+
+  var ACTIVATION_AML_SYMBOLS = {
+    ec: '<text x="14" y="19" font-family="DM Sans" font-weight="800" font-size="13" fill="currentColor" stroke="none" text-anchor="middle">EC</text>',
+    sentury: '<rect x="6" y="9" width="16" height="12" rx="3" class="activation-aml-draw" style="--len:60"/><line x1="14" y1="5" x2="14" y2="9" class="activation-aml-draw" style="--len:6"/><circle cx="10.5" cy="15" r="1.3" fill="currentColor" stroke="none"/><circle cx="17.5" cy="15" r="1.3" fill="currentColor" stroke="none"/>',
+    check: '<polyline points="6,14.5 12,20 22,8" class="activation-aml-draw" style="--len:26"/>'
+  };
+
+  function drawActivationMorph(stage, symbol, generation, done) {
+    stage.innerHTML = '<svg class="activation-aml-symbol" viewBox="0 0 28 28" aria-hidden="true">' + ACTIVATION_AML_SYMBOLS[symbol] + '</svg>';
+    window.setTimeout(function () {
+      if (activationMorphGeneration !== generation) return;
+      stage.firstElementChild.classList.add('activation-aml-pulse');
+      window.setTimeout(function () {
+        if (activationMorphGeneration === generation) done();
+      }, 360);
+    }, 420);
+  }
+
+  function startActivationMorph(button) {
+    var stage = button.querySelector('.cl-stage');
+    var text = button.querySelector('.cl-text');
+    if (!stage || !text) {
+      button.disabled = true;
+      return { complete: function (callback) { callback(); }, reset: function () { button.disabled = false; } };
+    }
+
+    var generation = ++activationMorphGeneration;
+    var index = 0;
+    if (!button.dataset.label) button.dataset.label = text.innerHTML;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.classList.add('loading');
+
+    function next() {
+      if (activationMorphGeneration !== generation) return;
+      drawActivationMorph(stage, index % 2 === 0 ? 'ec' : 'sentury', generation, next);
+      index += 1;
+    }
+
+    window.setTimeout(next, 180);
+
+    return {
+      complete: function (callback) {
+        if (activationMorphGeneration !== generation) return;
+        var confirmationGeneration = ++activationMorphGeneration;
+        drawActivationMorph(stage, 'check', confirmationGeneration, function () {
+          button.classList.remove('loading');
+          button.classList.add('confirmed');
+          button.removeAttribute('aria-busy');
+          text.textContent = button.dataset.done || 'Concluído';
+          stage.innerHTML = '';
+          window.setTimeout(callback, 180);
+        });
+      },
+      reset: function () {
+        if (activationMorphGeneration !== generation) return;
+        activationMorphGeneration += 1;
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        button.classList.remove('loading', 'confirmed');
+        text.innerHTML = button.dataset.label;
+        stage.innerHTML = '';
+      }
+    };
+  }
 
   function showState(name) {
     ['loading', 'error', 'form', 'success'].forEach(function (part) {
@@ -68,27 +134,29 @@
       error.classList.remove('hidden');
       return;
     }
-    button.disabled = true;
+    var morph = startActivationMorph(button);
     try {
       var result = await window.PasskeyClient.api('/activation/verify', { token: token, code: code });
-      state.accountExists = result.account_exists;
-      state.nickname = result.nickname;
-      var nicknameDisplay = document.getElementById('nickname-display');
-      nicknameDisplay.textContent = result.nickname ? 'Conta confirmada: ' + result.nickname : 'Conta confirmada.';
-      nicknameDisplay.classList.remove('identity-pending');
-      if (state.accountExists) {
-        document.querySelector('[data-step="2"]').style.display = 'none';
-        document.querySelectorAll('#step-indicator .step-line')[0].style.display = 'none';
-        document.getElementById('activation-intro').textContent = 'Sua conta existe. Cadastre uma nova passkey sem alterar seu personagem.';
-        showStep('passkey', 3);
-      } else {
-        showStep('character', 2);
-        initializeAvatarSelector();
-      }
+      morph.complete(function () {
+        state.accountExists = result.account_exists;
+        state.nickname = result.nickname;
+        var nicknameDisplay = document.getElementById('nickname-display');
+        nicknameDisplay.textContent = result.nickname ? 'Conta confirmada: ' + result.nickname : 'Conta confirmada.';
+        nicknameDisplay.classList.remove('identity-pending');
+        if (state.accountExists) {
+          document.querySelector('[data-step="2"]').style.display = 'none';
+          document.querySelectorAll('#step-indicator .step-line')[0].style.display = 'none';
+          document.getElementById('activation-intro').textContent = 'Sua conta existe. Cadastre uma nova passkey sem alterar seu personagem.';
+          showStep('passkey', 3);
+        } else {
+          showStep('character', 2);
+          initializeAvatarSelector();
+        }
+      });
     } catch (exception) {
       error.textContent = exception.message || 'Não foi possível validar o código.';
       error.classList.remove('hidden');
-      button.disabled = false;
+      morph.reset();
     }
   });
 
@@ -101,16 +169,18 @@
     var button = event.currentTarget;
     var error = document.getElementById('passkey-error');
     error.classList.add('hidden');
-    button.disabled = true;
+    var morph = startActivationMorph(button);
     try {
       var result = await window.PasskeyClient.registerPasskey(state.accountExists ? {} : { avatar_file_name: state.avatar });
-      localSession(result.user);
-      showState('success');
-      window.setTimeout(function () { window.location.replace('/app'); }, 900);
+      morph.complete(function () {
+        localSession(result.user);
+        showState('success');
+        window.setTimeout(function () { window.location.replace('/app'); }, 900);
+      });
     } catch (exception) {
       error.textContent = exception.message || 'Não foi possível criar a passkey.';
       error.classList.remove('hidden');
-      button.disabled = false;
+      morph.reset();
     }
   });
 

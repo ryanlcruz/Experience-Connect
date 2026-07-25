@@ -16,6 +16,8 @@ class AvatarSelector {
     this.metadata = null;
     this.metadataLoader = null;
     this.onSelect = options.onSelect || (() => {});
+    this.pageSize = Math.max(1, Number(options.pageSize) || 6);
+    this.currentPage = 0;
   }
 
   async init() {
@@ -78,28 +80,78 @@ class AvatarSelector {
   }
 
   render() {
+    this.renderCurrentPage();
+
+    avatarSelectorDebugLog(`[AvatarSelector] Rendered page ${this.currentPage + 1}/${this.getPageCount()} with ${Math.min(this.pageSize, this.avatars.length)} of ${this.avatars.length} avatars`);
+  }
+
+  getPageCount() {
+    return Math.max(1, Math.ceil(this.avatars.length / this.pageSize));
+  }
+
+  renderCurrentPage() {
+    const pageCount = this.getPageCount();
+    this.currentPage = Math.min(Math.max(this.currentPage, 0), pageCount - 1);
     this.container.innerHTML = '';
 
     const grid = document.createElement('div');
     grid.className = 'avatar-grid';
 
-    this.avatars.forEach(avatar => {
+    const start = this.currentPage * this.pageSize;
+    const pageAvatars = this.avatars.slice(start, start + this.pageSize);
+    pageAvatars.forEach(avatar => {
       const card = this.createAvatarCard(avatar);
       grid.appendChild(card);
     });
 
     this.container.appendChild(grid);
 
-    avatarSelectorDebugLog(`[AvatarSelector] Rendered ${this.avatars.length} avatar cards`);
+    if (pageCount > 1) {
+      const pagination = document.createElement('nav');
+      pagination.className = 'avatar-pagination';
+      pagination.setAttribute('aria-label', 'Paginação de personagens');
+
+      const previous = this.createPageControl('previous', 'Página anterior', this.currentPage === 0);
+      const pageLabel = document.createElement('span');
+      pageLabel.className = 'avatar-page-label';
+      pageLabel.textContent = `${this.currentPage + 1} de ${pageCount}`;
+      pageLabel.setAttribute('aria-live', 'polite');
+      const next = this.createPageControl('next', 'Próxima página', this.currentPage === pageCount - 1);
+
+      previous.addEventListener('click', () => {
+        this.currentPage -= 1;
+        this.renderCurrentPage();
+      });
+      next.addEventListener('click', () => {
+        this.currentPage += 1;
+        this.renderCurrentPage();
+      });
+
+      pagination.append(previous, pageLabel, next);
+      this.container.appendChild(pagination);
+    }
+  }
+
+  createPageControl(direction, label, disabled) {
+    const control = document.createElement('button');
+    control.type = 'button';
+    control.className = `avatar-page-control avatar-page-control-${direction}`;
+    control.disabled = disabled;
+    control.setAttribute('aria-label', label);
+    control.innerHTML = direction === 'previous'
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg>';
+    return control;
   }
 
   createAvatarCard(avatar) {
-    const card = document.createElement('div');
+    const card = document.createElement('button');
+    card.type = 'button';
     card.className = 'avatar-card';
     card.dataset.filename = avatar.filename;
-    card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-label', `Select avatar: ${avatar.name}`);
+    card.setAttribute('aria-label', `Escolher personagem: ${avatar.name}`);
+    card.setAttribute('aria-pressed', String(this.selectedAvatar === avatar.filename));
+    if (this.selectedAvatar === avatar.filename) card.classList.add('selected');
 
     const imgContainer = document.createElement('div');
     imgContainer.className = 'avatar-image-container';
@@ -201,13 +253,6 @@ class AvatarSelector {
     // depended on the password-era invite script and is intentionally gone.
     card.addEventListener('click', () => this.handleSelection(avatar.filename));
 
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this.handleSelection(avatar.filename);
-      }
-    });
-
     card.addEventListener('mouseenter', () => {
       card.classList.add('avatar-hover');
     });
@@ -228,8 +273,10 @@ class AvatarSelector {
     allCards.forEach(card => {
       if (card.dataset.filename === avatarFilename) {
         card.classList.add('selected');
+        card.setAttribute('aria-pressed', 'true');
       } else {
         card.classList.remove('selected');
+        card.setAttribute('aria-pressed', 'false');
       }
     });
 

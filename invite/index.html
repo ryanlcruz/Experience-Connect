@@ -8,15 +8,24 @@
   <link rel="icon" type="image/png" href="https://favicon.rysn-craft.workers.dev">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700;9..40,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/invite/invite.css">
+  <link rel="stylesheet" href="/invite/activation-layout.css">
   <script src="/frontend/js/console-control.js"></script>
   <script src="/frontend/js/shared/cx-session.js"></script>
   <script>window.CxSession.bootstrapPage({ mode: 'public', hide: true, redirectAuthenticatedTo: '/app', enforcePlatformStatus: false });</script>
   <script src="/frontend/js/env-loader.js"></script>
 </head>
-<body>
-  <main class="invite-container">
+<body class="activation-page">
+  <main class="activation-shell">
+    <aside class="activation-scene" aria-label="Experience Connect">
+      <div class="activation-scene-stage">
+        <img class="activation-scene-image" src="/frontend/assets/image/login-scene.webp" alt="">
+        <p class="activation-sticker activation-sticker-top">SUA JORNADA<br><span>COME&Ccedil;A AQUI</span></p>
+        <p class="activation-sticker activation-sticker-bottom">CADA ESCOLHA<br>ABRE UM NOVO <span>CAMINHO.</span></p>
+      </div>
+    </aside>
+    <section class="activation-workspace" aria-label="Ativação de acesso">
     <section id="loading-state" class="state">
       <p>Preparando a ativação segura…</p>
     </section>
@@ -52,7 +61,7 @@
             <input id="invite-code" type="text" placeholder="EC-1234-12345-12345" maxlength="19" autocomplete="one-time-code" autocapitalize="characters" required autofocus>
           </div>
           <div id="code-error" class="form-error hidden" role="alert"></div>
-          <button type="submit" class="btn-primary"><span class="btn-text">Continuar</span></button>
+          <span class="activation-action-wrap"><button type="submit" id="code-submit" class="activation-primary btn-cl" data-done="Confirmado"><span class="cl-text">Continuar</span><span class="cl-stage" aria-hidden="true"></span></button></span>
         </form>
       </div>
 
@@ -61,13 +70,13 @@
         <p class="step-description">Essa escolha faz parte da criação da sua conta.</p>
         <div id="avatar-selector-container" class="avatar-selector-container"></div>
         <div id="avatar-error" class="form-error hidden" role="alert"></div>
-        <button type="button" id="character-next" class="btn-primary" disabled><span class="btn-text">Continuar</span></button>
+        <button type="button" id="character-next" class="activation-primary" disabled>Continuar</button>
       </div>
 
       <div id="step-passkey" class="step-content hidden">
         <img class="passkey-guide" src="/frontend/assets/image/ec-passkey-guia.svg" alt="Guia visual: criar passkey, confirmar sua identidade no dispositivo e concluir a ativação.">
         <div id="passkey-error" class="form-error hidden" role="alert"></div>
-        <button type="button" id="create-passkey" class="btn-primary"><span class="btn-text">Criar passkey</span></button>
+        <span class="activation-action-wrap"><button type="button" id="create-passkey" class="activation-primary btn-cl" data-done="Pronto"><span class="cl-text">Criar passkey</span><span class="cl-stage" aria-hidden="true"></span></button></span>
       </div>
     </section>
 
@@ -75,6 +84,7 @@
       <img src="/frontend/assets/image/icons8-check-mark-96.apng.png" alt="" class="success-icon">
       <h1 class="success-title">Conta ativada!</h1>
       <p class="success-text">Sua passkey foi cadastrada e seu acesso está liberado.</p>
+    </section>
     </section>
   </main>
 
