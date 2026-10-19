@@ -18,7 +18,7 @@ setup(
     description="CLI Admin para gerenciamento do backend Experience Connect",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Ryanleoncoder/Experiencie-Connect",
+    url="https://github.com/ryanlcruz/Experiencie-Connect",
     py_modules=["cli"],
     install_requires=[
         "click>=8.1.7",
